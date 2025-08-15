@@ -121,16 +121,16 @@ func set_player_id(id: int):
 	_set_player_color()
 	print("👤 Jogador configurado - ID: ", id, " Nome: ", name)
 
-func setup_for_network(id: int, is_local: bool):
+func setup_for_network(id: int, local_control: bool):
 	"""
 	Configura o jogador para networking
 	Chamado pelo GameManager quando o jogador é criado
 	"""
 	player_id = id
-	is_local_player = is_local
+	is_local_player = local_control
 
 	# 🔐 Define autoridade (quem pode modificar este jogador)
-	if is_local:
+	if local_control:
 		set_multiplayer_authority(id)
 		print("🎮 Jogador local configurado - ID: ", id)
 	else:

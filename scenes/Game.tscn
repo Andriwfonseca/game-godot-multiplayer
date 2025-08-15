@@ -1,0 +1,69 @@
+[gd_scene load_steps=6 format=3 uid="uid://dteyy8k7doqy"]
+
+[ext_resource type="Script" uid="uid://u28ftrxt31ro" path="res://scripts/GameManager.gd" id="1_8h5k8"]
+[ext_resource type="PackedScene" uid="uid://cg1r6vp8shsqf" path="res://scenes/Player.tscn" id="2_cpr0p"]
+[ext_resource type="Texture2D" uid="uid://bfhi5hxtdtv03" path="res://icon.svg" id="2_qbsmt"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cpr0p"]
+size = Vector2(1023, 124)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qbsmt"]
+size = Vector2(510, 127)
+
+[node name="Game" type="Node2D"]
+
+[node name="GameManager" type="Node" parent="."]
+script = ExtResource("1_8h5k8")
+player_scene = ExtResource("2_cpr0p")
+
+[node name="Players" type="Node2D" parent="GameManager"]
+
+[node name="SpawnPoints" type="Node2D" parent="GameManager"]
+
+[node name="SpawnPoint1" type="Marker2D" parent="GameManager/SpawnPoints"]
+position = Vector2(100, 400)
+
+[node name="SpawnPoint2" type="Marker2D" parent="GameManager/SpawnPoints"]
+position = Vector2(300, 400)
+
+[node name="SpawnPoint3" type="Marker2D" parent="GameManager/SpawnPoints"]
+position = Vector2(500, 400)
+
+[node name="SpawnPoint4" type="Marker2D" parent="GameManager/SpawnPoints"]
+position = Vector2(700, 400)
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="GameManager"]
+_spawnable_scenes = PackedStringArray("uid://cg1r6vp8shsqf")
+spawn_path = NodePath("../Players")
+
+[node name="Level" type="Node2D" parent="."]
+
+[node name="Platforms" type="Node2D" parent="Level"]
+
+[node name="Ground" type="StaticBody2D" parent="Level/Platforms"]
+position = Vector2(400, 500)
+
+[node name="Sprite2D" type="Sprite2D" parent="Level/Platforms/Ground"]
+modulate = Color(0.5, 0.3, 0.2, 1)
+scale = Vector2(8, 1)
+texture = ExtResource("2_qbsmt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Level/Platforms/Ground"]
+position = Vector2(0.5, -1)
+shape = SubResource("RectangleShape2D_cpr0p")
+debug_color = Color(0.667855, 0.510079, 0.035151, 0.42)
+
+[node name="Platform1" type="StaticBody2D" parent="Level/Platforms"]
+position = Vector2(1238, 498)
+
+[node name="Sprite2D" type="Sprite2D" parent="Level/Platforms/Platform1"]
+modulate = Color(0.5, 0.3, 0.2, 1)
+scale = Vector2(4, 1)
+texture = ExtResource("2_qbsmt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Level/Platforms/Platform1"]
+position = Vector2(0, -0.5)
+shape = SubResource("RectangleShape2D_qbsmt")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(400, 300)

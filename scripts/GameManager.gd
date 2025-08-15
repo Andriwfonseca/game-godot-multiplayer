@@ -100,6 +100,22 @@ func _force_spawn_player(peer_id: int, spawn_position: Vector2):
 	players_container.add_child(player_instance)
 	print("✅ CLIENTE: Jogador forçado criado: ", player_instance.name)
 
+	# 📹 NOTIFICA CÂMERA se é jogador local
+	if is_local:
+		print("📹 Notificando câmera sobre jogador local criado: ", player_instance.name)
+		_notify_camera_about_local_player(player_instance)
+
+func _notify_camera_about_local_player(player: Player):
+	"""
+	Notifica a câmera sobre o jogador local criado
+	"""
+	# Procura pela câmera na cena
+	var camera = get_node("../Camera2D")
+	if camera and camera.has_method("set_target"):
+		print("📹 Definindo target da câmera: ", player.name)
+		camera.set_target(player)
+	else:
+		print("❌ Câmera não encontrada ou sem método set_target")
 
 # 📍 FUNÇÃO PARA OBTER POSIÇÃO DE SPAWN
 func _get_spawn_position() -> Vector2:

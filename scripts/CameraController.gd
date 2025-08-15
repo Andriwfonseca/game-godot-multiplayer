@@ -51,30 +51,65 @@ func _on_game_started():
 	"""
 	print("🎮 Jogo iniciado - procurando jogador local...")
 
-	# ⏱️ Aguarda um frame para garantir que os jogadores foram spawnados
-	await get_tree().process_frame
+	# ⏱️ Aguarda mais tempo para RPC de jogadores
+	await get_tree().create_timer(0.5).timeout
 
-	if game_manager:
-		# 🔍 Pega o jogador local
+	# 🔄 Tenta encontrar jogador local com mais paciência
+	_find_local_player_with_retry()
+
+func _find_local_player_with_retry():
+	"""
+	Procura o jogador local com múltiplas tentativas
+	"""
+	if not game_manager:
+		print("❌ GameManager não encontrado!")
+		return
+
+	var max_attempts = 10 # Mais tentativas
+	var attempt = 0
+
+	while attempt < max_attempts:
+		attempt += 1
+		print("🔍 Tentativa ", attempt, " de encontrar jogador local...")
+
 		target_player = game_manager.get_local_player()
 
 		if target_player:
-			print("📹 Câmera agora segue o jogador local: ", target_player.name)
-			# 📍 Posiciona a câmera imediatamente no jogador (sem animação)
+			print("📹 🎉 Câmera encontrou jogador local: ", target_player.name)
 			global_position = target_player.global_position + camera_offset
-		else:
-			print("⚠️ Jogador local não encontrado ainda, tentando novamente...")
-			# 🔄 Tenta novamente após 1 segundo (máximo 5 tentativas)
-			var max_attempts = 5
-			for attempt in range(max_attempts):
-				await get_tree().create_timer(1.0).timeout
-				target_player = game_manager.get_local_player()
-				if target_player:
-					print("📹 Câmera encontrou jogador local na tentativa ", attempt + 1, ": ", target_player.name)
-					global_position = target_player.global_position + camera_offset
-					return
+			return
 
-			print("❌ Erro: Não foi possível encontrar jogador local após ", max_attempts, " tentativas")
+		# Aguarda antes da próxima tentativa
+		await get_tree().create_timer(0.5).timeout
+
+	print("❌ Erro: Câmera não conseguiu encontrar jogador local após ", max_attempts, " tentativas")
+	print("🔍 Tentando método alternativo...")
+	_find_local_player_alternative()
+
+func _find_local_player_alternative():
+	"""
+	Método alternativo para encontrar jogador local
+	"""
+	print("🔍 Método alternativo: Procurando jogador local diretamente...")
+
+	if not game_manager:
+		return
+
+	var players_container = game_manager.get_node("Players")
+	if not players_container:
+		print("❌ Players container não encontrado")
+		return
+
+	# Procura diretamente nos filhos
+	for child in players_container.get_children():
+		print("🔍 Verificando jogador: ", child.name)
+		if child.has_method("is_local") and child.is_local():
+			target_player = child
+			print("📹 🎉 Método alternativo encontrou jogador local: ", target_player.name)
+			global_position = target_player.global_position + camera_offset
+			return
+
+	print("❌ Método alternativo também falhou")
 
 func set_target(player: Player):
 	"""

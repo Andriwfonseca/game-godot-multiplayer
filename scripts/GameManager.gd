@@ -132,7 +132,17 @@ func _create_player_manually(peer_id: int, local_control: bool):
 		# Se chegou até aqui, continua...
 		player_instance.setup_for_network(peer_id, local_control)
 		player_instance.position = _get_spawn_position()
+
+		# 🔧 FORÇA o nome correto ANTES de adicionar à cena
+		player_instance.name = "Player_" + str(peer_id)
+
+		# 🔍 DEBUG - Nome antes de adicionar
+		print("🔍 DEBUG - Nome do jogador antes: ", player_instance.name)
+
 		players_container.add_child(player_instance)
+
+		# 🔍 DEBUG - Nome depois de adicionar
+		print("🔍 DEBUG - Nome do jogador depois: ", player_instance.name)
 		print("✅ Jogador criado: ", player_instance.name)
 	else:
 		print("❌ player_scene é null!")
@@ -193,7 +203,17 @@ func get_local_player() -> Player:
 	Retorna o jogador local (controlado por este cliente)
 	"""
 	var local_id = multiplayer.get_unique_id()
+	print("🔍 DEBUG get_local_player - local_id: ", local_id)
+	print("🔍 DEBUG get_local_player - procurando: Player_", local_id)
+	print("🔍 DEBUG get_local_player - jogadores na cena:")
+
+	# Lista todos os jogadores para debug
+	for child in players_container.get_children():
+		print("  - ", child.name, " (", child.get_class(), ")")
+
 	var player_node = players_container.get_node_or_null("Player_" + str(local_id))
+	print("🔍 DEBUG get_local_player - encontrado: ", player_node)
+
 	return player_node as Player
 
 func is_game_started() -> bool:

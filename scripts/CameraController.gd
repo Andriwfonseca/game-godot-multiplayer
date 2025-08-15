@@ -63,11 +63,18 @@ func _on_game_started():
 			# 📍 Posiciona a câmera imediatamente no jogador (sem animação)
 			global_position = target_player.global_position + camera_offset
 		else:
-			print("❌ Erro: Jogador local não encontrado!")
-			print("🔍 Tentando novamente em 1 segundo...")
-			# 🔄 Tenta novamente após 1 segundo
-			await get_tree().create_timer(1.0).timeout
-			_on_game_started()
+			print("⚠️ Jogador local não encontrado ainda, tentando novamente...")
+			# 🔄 Tenta novamente após 1 segundo (máximo 5 tentativas)
+			var max_attempts = 5
+			for attempt in range(max_attempts):
+				await get_tree().create_timer(1.0).timeout
+				target_player = game_manager.get_local_player()
+				if target_player:
+					print("📹 Câmera encontrou jogador local na tentativa ", attempt + 1, ": ", target_player.name)
+					global_position = target_player.global_position + camera_offset
+					return
+
+			print("❌ Erro: Não foi possível encontrar jogador local após ", max_attempts, " tentativas")
 
 func set_target(player: Player):
 	"""

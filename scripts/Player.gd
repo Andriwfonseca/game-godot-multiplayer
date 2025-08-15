@@ -25,17 +25,15 @@ func _ready():
 	"""
 	Função chamada quando o jogador é criado
 	"""
-	# 🔍 Descobre se este é o jogador local
-	# (Quem tem autoridade para controlá-lo)
-	if multiplayer.get_remote_sender_id() == 0:
-		is_local_player = true
-		set_multiplayer_authority(multiplayer.get_unique_id())
+	print("🎮 Player _ready chamado")
 
 	# 🎨 Aplica cor única para cada jogador
 	_set_player_color()
 
+	# ⚙️ Configuração será feita via setup_for_network()
+
 	# 🌐 CONFIGURAÇÃO MANUAL DE SINCRONIZAÇÃO
-	if multiplayer_sync:
+	if multiplayer_sync and multiplayer and multiplayer.has_multiplayer_peer():
 		# Define quais propriedades sincronizar
 		multiplayer_sync.set_multiplayer_authority(multiplayer.get_unique_id())
 		print("🔗 Sincronização configurada para jogador: ", multiplayer.get_unique_id())
@@ -75,8 +73,15 @@ func _physics_process(delta):
 	if not is_local_player:
 		return
 
+	# 📍 Guarda posição anterior para comparar
+	var old_position = global_position
+
 	# 🎮 Processa movimentação
 	_handle_movement(delta)
+
+	# 📡 Se a posição mudou, sincroniza via RPC
+	if global_position.distance_to(old_position) > 1.0: # Só envia se moveu mais de 1 pixel
+		_sync_position.rpc(global_position, velocity)
 
 func _handle_movement(delta):
 	"""
@@ -130,26 +135,37 @@ func setup_for_network(id: int, local_control: bool):
 	is_local_player = local_control
 
 	# 🔐 Define autoridade (quem pode modificar este jogador)
-	if local_control:
-		set_multiplayer_authority(id)
-		print("🎮 Jogador local configurado - ID: ", id)
+	# REGRA: Cada jogador é controlado pelo cliente com o mesmo ID
+	set_multiplayer_authority(id)
+
+	# 🎯 Determina se É o jogador local baseado no ID
+	# PROTEÇÃO: Verifica se multiplayer existe
+	if multiplayer and multiplayer.has_multiplayer_peer():
+		is_local_player = (id == multiplayer.get_unique_id())
 	else:
-		print("🌐 Jogador remoto configurado - ID: ", id)
+		# Se não tem multiplayer, considera como local (modo single)
+		is_local_player = local_control
+
+	if is_local_player:
+		print("🎮 Jogador LOCAL configurado - ID: ", id, " (EU controlo)")
+	else:
+		print("🌐 Jogador REMOTO configurado - ID: ", id, " (Outro controla)")
 
 	_set_player_color()
 
 # 📡 FUNÇÕES RPC (REMOTE PROCEDURE CALL) - Para networking avançado
 # Por enquanto não precisamos, mas deixamos preparado para futuras melhorias
 
-@rpc("any_peer", "call_local")
-func sync_position(pos: Vector2, vel: Vector2):
+@rpc("any_peer", "unreliable")
+func _sync_position(pos: Vector2, vel: Vector2):
 	"""
-	Função para sincronização manual (se necessário)
-	O MultiplayerSynchronizer já faz isso automaticamente
+	Sincroniza posição e velocidade com outros clientes
 	"""
+	# 📡 Só aceita se NÃO for o jogador local (evita conflito)
 	if not is_local_player:
-		position = pos
+		global_position = pos
 		velocity = vel
+		# print("📡 Posição sincronizada: ", name, " -> ", pos) # Debug se necessário
 
 # 🎯 FUNÇÕES ÚTEIS PARA OUTROS SCRIPTS
 

@@ -21,5 +21,3 @@ shape = SubResource("RectangleShape2D_v6fml")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_3li8b")
-
-[node name="Node2D" type="Node2D" parent="."]

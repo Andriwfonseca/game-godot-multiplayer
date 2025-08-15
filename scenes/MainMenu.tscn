@@ -1,0 +1,159 @@
+[gd_scene load_steps=2 format=3 uid="uid://d01dgvj3eedhw"]
+
+[ext_resource type="Script" uid="uid://dks5t5p6ketx6" path="res://scripts/MainMenu.gd" id="1_yqorp"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 580.0
+offset_top = 140.0
+offset_right = 620.0
+offset_bottom = 180.0
+script = ExtResource("1_yqorp")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -194.0
+offset_top = 4.0
+offset_right = -194.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.2, 1)
+
+[node name="MainPanel" type="Panel" parent="."]
+custom_minimum_size = Vector2(300, 240)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -120.0
+offset_right = 150.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="MainPanel/VBoxContainer"]
+layout_mode = 2
+text = "Jogo Multiplayer 2D"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MainPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="HostButton" type="Button" parent="MainPanel/VBoxContainer"]
+layout_mode = 2
+text = "Hospedar Jogo"
+
+[node name="JoinButton" type="Button" parent="MainPanel/VBoxContainer"]
+layout_mode = 2
+text = "Conectar ao Jogo"
+
+[node name="HSeparator2" type="HSeparator" parent="MainPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="QuitButton" type="Button" parent="MainPanel/VBoxContainer"]
+layout_mode = 2
+text = "Sair"
+
+[node name="JoinPanel" type="Panel" parent="."]
+visible = false
+custom_minimum_size = Vector2(300, 200)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -100.0
+offset_right = 150.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="JoinPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="JoinPanel/VBoxContainer"]
+layout_mode = 2
+text = "Conectar ao Servidor"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="JoinPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="IPLabel" type="Label" parent="JoinPanel/VBoxContainer"]
+layout_mode = 2
+text = "Endereço IP:"
+
+[node name="IPInput" type="LineEdit" parent="JoinPanel/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "127.0.0.1"
+
+[node name="PortLabel" type="Label" parent="JoinPanel/VBoxContainer"]
+layout_mode = 2
+text = "Porta:"
+
+[node name="PortInput" type="LineEdit" parent="JoinPanel/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "7000"
+
+[node name="HSeparator2" type="HSeparator" parent="JoinPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="JoinPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ConnectButton" type="Button" parent="JoinPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Conectar"
+
+[node name="BackButton" type="Button" parent="JoinPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Voltar"
+
+[node name="StatusLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -566.0
+offset_top = -141.0
+offset_right = -166.0
+offset_bottom = -111.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Jogo Multiplayer 2D - Plataforma"
+horizontal_alignment = 1

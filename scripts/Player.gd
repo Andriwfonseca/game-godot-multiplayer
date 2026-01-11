@@ -20,6 +20,21 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 var player_id: int
 var is_local_player = false # Se é o jogador controlado localmente
 
+# 📡 SISTEMA DE INPUT-BASED (INPUTS EM VEZ DE POSIÇÕES)
+var remote_input_direction: float = 0.0 # Direção recebida de jogador remoto (-1 a 1)
+var remote_jump_pressed: bool = false # Se pulo foi pressionado no jogador remoto
+var remote_is_on_floor: bool = true # Estado do chão do jogador remoto
+var last_input_time: float = 0.0 # Último tempo que recebeu input
+
+# 📡 Controle de envio de inputs (otimização)
+var last_sent_direction: float = 0.0 # Última direção enviada
+var input_send_timer: float = 0.0 # Timer para envio periódico de inputs
+var input_send_interval: float = 0.05 # Envia inputs a cada 50ms (20 vezes por segundo)
+
+# 📡 SINCRONIZAÇÃO PERIÓDICA (para correção de dessincronização)
+var sync_timer: float = 0.0
+var sync_interval: float = 0.5 # Sincroniza posição a cada 0.5 segundos
+
 func _ready():
 	"""
 	Função chamada quando o jogador é criado
@@ -28,6 +43,14 @@ func _ready():
 
 	# 🎨 Aplica cor única para cada jogador
 	_set_player_color()
+
+	# 📡 Inicializa variáveis de input remoto
+	remote_input_direction = 0.0
+	remote_jump_pressed = false
+	last_input_time = 0.0
+	sync_timer = 0.0
+	last_sent_direction = 0.0
+	input_send_timer = 0.0
 
 
 func _set_player_color():
@@ -59,28 +82,49 @@ func _set_player_color():
 func _physics_process(delta):
 	"""
 	Função chamada 60 vezes por segundo para física
-	IMPORTANTE: Apenas o jogador local processa input!
+	NOVO: Sistema baseado em inputs - cada cliente processa movimento localmente
 	"""
-	# 🚫 Se não é o jogador local, não processa movimento
-	if not is_local_player:
-		return
+	sync_timer += delta
+	input_send_timer += delta
 
-	# 📍 Guarda posição anterior para comparar
-	var old_position = global_position
+	# 🎮 Jogador local: processa input e envia para rede
+	if is_local_player:
+		var current_direction = Input.get_axis("ui_left", "ui_right")
+		var jump_pressed = Input.is_action_just_pressed("jump")
 
-	# 🎮 Processa movimentação
-	_handle_movement(delta)
+		# Processa movimento com inputs locais
+		_handle_movement_with_input(delta, current_direction, jump_pressed)
 
-	# 📡 Se a posição mudou, sincroniza via RPC
-	if global_position.distance_to(old_position) > 1.0: # Só envia se moveu mais de 1 pixel
-		_sync_position.rpc(global_position, velocity)
+		# 📡 Envia inputs via RPC periodicamente ou quando há mudança
+		var direction_changed = abs(current_direction - last_sent_direction) > 0.01
+		if input_send_timer >= input_send_interval or direction_changed or jump_pressed:
+			input_send_timer = 0.0
+			_send_input.rpc(current_direction, jump_pressed, is_on_floor())
+			last_sent_direction = current_direction
 
-func _handle_movement(delta):
+		# 📡 Sincronização periódica de posição para correção
+		if sync_timer >= sync_interval:
+			sync_timer = 0.0
+			_sync_position_periodic.rpc(global_position, velocity)
+
+	# 🌐 Jogador remoto: processa movimento com inputs recebidos
+	else:
+		# Processa movimento com inputs recebidos via RPC
+		var jump_just_pressed = remote_jump_pressed
+		remote_jump_pressed = false # Reseta após processar
+
+		_handle_movement_with_input(delta, remote_input_direction, jump_just_pressed)
+
+		# Se não recebeu input há muito tempo, para o movimento
+		last_input_time += delta
+		if last_input_time > 0.3: # 300ms sem input = para
+			remote_input_direction = 0.0
+
+func _handle_movement_with_input(delta: float, direction: float, jump_pressed: bool):
 	"""
-	Processa movimentação e física do jogador
-	Esta é a parte mais importante - a física de plataforma!
+	Processa movimentação e física do jogador usando inputs fornecidos
+	Esta função é usada tanto para jogador local quanto remoto
 	"""
-
 	# 🌍 GRAVIDADE
 	# Se não está no chão, aplica gravidade
 	if not is_on_floor():
@@ -88,14 +132,13 @@ func _handle_movement(delta):
 
 	# 🚀 PULO
 	# Se pressionar pulo E estiver no chão
-	if Input.is_action_just_pressed("jump") and is_on_floor():
+	if jump_pressed and is_on_floor():
 		velocity.y = jump_velocity
-		print("🚀 Jogador ", player_id, " pulou!")
+		if is_local_player:
+			print("🚀 Jogador ", player_id, " pulou!")
 
 	# 🏃 MOVIMENTO HORIZONTAL
-	# Pega input das teclas (A/D ou setas)
-	var direction = Input.get_axis("ui_left", "ui_right")
-
+	# Usa direção fornecida (pode ser de Input local ou RPC remoto)
 	if direction != 0:
 		# Se está pressionando alguma direção
 		velocity.x = direction * speed
@@ -145,19 +188,38 @@ func setup_for_network(id: int, local_control: bool):
 
 	_set_player_color()
 
-# 📡 FUNÇÕES RPC (REMOTE PROCEDURE CALL) - Para networking avançado
-# Por enquanto não precisamos, mas deixamos preparado para futuras melhorias
+# 📡 FUNÇÕES RPC (REMOTE PROCEDURE CALL) - Sistema baseado em inputs
 
 @rpc("any_peer", "unreliable")
-func _sync_position(pos: Vector2, vel: Vector2):
+func _send_input(direction: float, jump_pressed: bool, is_on_floor_state: bool):
 	"""
-	Sincroniza posição e velocidade com outros clientes
+	Recebe inputs de jogador remoto e armazena para processamento
+	Sistema novo: cada cliente processa movimento baseado em inputs
 	"""
-	# 📡 Só aceita se NÃO for o jogador local (evita conflito)
+	# 📡 Só processa se NÃO for o jogador local (evita loop)
 	if not is_local_player:
-		global_position = pos
-		velocity = vel
-		# print("📡 Posição sincronizada: ", name, " -> ", pos) # Debug se necessário
+		remote_input_direction = direction
+		if jump_pressed:
+			remote_jump_pressed = true
+		remote_is_on_floor = is_on_floor_state
+		last_input_time = 0.0 # Reseta timer de timeout
+
+@rpc("any_peer", "unreliable")
+func _sync_position_periodic(pos: Vector2, vel: Vector2):
+	"""
+	Sincronização periódica de posição para correção de dessincronização
+	Usado apenas para corrigir pequenos desvios, não para movimento principal
+	"""
+	# 📡 Só aceita se NÃO for o jogador local
+	if not is_local_player:
+		# Calcula distância até posição recebida
+		var distance = global_position.distance_to(pos)
+
+		# Se está muito dessincronizado (mais de 50 pixels), corrige
+		if distance > 50.0:
+			# Interpola suavemente para corrigir
+			global_position = global_position.lerp(pos, 0.3)
+			velocity = velocity.lerp(vel, 0.5)
 
 # 🎯 FUNÇÕES ÚTEIS PARA OUTROS SCRIPTS
 

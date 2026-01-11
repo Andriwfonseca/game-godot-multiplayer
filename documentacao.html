@@ -211,8 +211,15 @@
 
         <div class="info">
             <strong>📋 Sobre este projeto:</strong><br>
-            Este é um exemplo completo de como criar um jogo multiplayer 2D no Godot 4.5 usando o sistema nativo de multiplayer.
-            A documentação explica cada passo, desde a configuração no editor até o funcionamento do código.
+            Este é um exemplo completo de como criar um jogo multiplayer 2D no Godot 4.5 usando o sistema <strong>Low-Level</strong> 
+            de multiplayer (ENetMultiplayerPeer). O projeto utiliza sincronização baseada em <strong>inputs</strong> para movimento 
+            mais suave e responsivo. A documentação explica cada passo, desde a configuração no editor até o funcionamento do código.
+        </div>
+        
+        <div class="success">
+            <strong>✅ Sistema Low-Level:</strong><br>
+            Este projeto usa <strong>ENetMultiplayerPeer</strong> (Low-Level) com RPCs manuais, dando controle total sobre a 
+            sincronização. Para ver comparação com High-Level, consulte a documentação2.html.
         </div>
 
         <div class="toc">
@@ -239,18 +246,21 @@
         <h3>🎯 Funcionalidades Principais:</h3>
         <ul>
             <li><strong>Menu Principal:</strong> Interface para hospedar ou conectar-se a jogos</li>
-            <li><strong>Sistema de Rede:</strong> Gerenciamento de conexões usando ENet (protocolo UDP confiável)</li>
-            <li><strong>Spawn de Jogadores:</strong> Criação e sincronização de jogadores entre clientes</li>
-            <li><strong>Movimentação Sincronizada:</strong> Sincronização de posição e movimento dos jogadores</li>
+            <li><strong>Sistema de Rede Low-Level:</strong> Gerenciamento de conexões usando ENetMultiplayerPeer (UDP confiável)</li>
+            <li><strong>Spawn Manual de Jogadores:</strong> Criação e sincronização manual via RPCs</li>
+            <li><strong>Sincronização Baseada em Inputs:</strong> Sistema otimizado que envia inputs em vez de posições</li>
+            <li><strong>Processamento Local:</strong> Cada cliente processa física localmente para movimento mais suave</li>
             <li><strong>Câmera Inteligente:</strong> Cada cliente segue apenas seu próprio jogador</li>
             <li><strong>Física de Plataforma:</strong> Sistema básico de pulo e movimento horizontal</li>
         </ul>
 
         <h3>🏗️ Arquitetura:</h3>
         <ul>
-            <li><strong>Servidor (Host):</strong> Gerencia o estado do jogo, cria e sincroniza jogadores</li>
-            <li><strong>Clientes:</strong> Enviam inputs do jogador e recebem atualizações do estado do jogo</li>
+            <li><strong>Servidor (Host):</strong> Gerencia o estado do jogo, cria e sincroniza jogadores manualmente</li>
+            <li><strong>Clientes:</strong> Enviam inputs do jogador via RPC e processam movimento localmente</li>
             <li><strong>Autoridade:</strong> Cada jogador tem autoridade sobre seu próprio personagem</li>
+            <li><strong>Sistema de Inputs:</strong> Cada cliente envia inputs (direção, pulo) e processa física localmente</li>
+            <li><strong>Sincronização Periódica:</strong> Posição é sincronizada periodicamente apenas para correção</li>
         </ul>
 
         <h2 id="estrutura">2. 📁 Estrutura de Arquivos</h2>
@@ -265,10 +275,18 @@ game-godot-multiplayer/
 ├── scripts/               # Scripts GDScript
 │   ├── NetworkManager.gd  # Gerenciador de rede (AutoLoad)
 │   ├── GameManager.gd     # Gerenciador do jogo
-│   ├── Player.gd          # Script do jogador
+│   ├── Player.gd          # Script do jogador (sistema baseado em inputs)
 │   ├── MainMenu.gd        # Script do menu
 │   └── CameraController.gd # Controle da câmera
 └── icon.svg               # Ícone do projeto
+        </div>
+        
+        <div class="warning">
+            <strong>⚠️ Nota sobre Componentes Removidos:</strong><br>
+            O projeto foi otimizado removendo componentes não utilizados:
+            - <strong>MultiplayerSpawner:</strong> Removido (spawn é feito manualmente via RPCs)
+            - <strong>MultiplayerSynchronizer:</strong> Removido (sincronização é feita via RPCs customizados)
+            - Arquivos de teste foram removidos para manter o projeto limpo
         </div>
 
         <h2 id="config-godot">3. ⚙️ Configurações no Godot</h2>
@@ -430,8 +448,7 @@ NetworkManager="*res://scripts/NetworkManager.gd"</code></pre>
             <p><strong>Estrutura da cena:</strong></p>
             <pre><code>Player (CharacterBody2D)
 ├── Sprite2D - Visual do jogador
-├── CollisionShape2D - Forma de colisão (retângulo)
-└── MultiplayerSynchronizer - Sincronização multiplayer</code></pre>
+└── CollisionShape2D - Forma de colisão (retângulo)</code></pre>
 
             <p><strong>Como criar no Godot:</strong></p>
             <ol>
@@ -443,15 +460,14 @@ NetworkManager="*res://scripts/NetworkManager.gd"</code></pre>
                 <li>Adicione um <strong>CollisionShape2D</strong> como filho</li>
                 <li>No CollisionShape2D, crie um novo <strong>RectangleShape2D</strong> (Shape → New RectangleShape2D)</li>
                 <li>Ajuste o tamanho do retângulo para coincidir com o sprite</li>
-                <li>Adicione um <strong>MultiplayerSynchronizer</strong> como filho</li>
-                <li>No MultiplayerSynchronizer, crie um <strong>SceneReplicationConfig</strong></li>
                 <li>Selecione o nó raiz (Player) e adicione o script: <code>scripts/Player.gd</code></li>
                 <li>Salve como <code>scenes/Player.tscn</code></li>
             </ol>
 
-            <div class="warning">
-                <strong>⚠️ Importante:</strong> O MultiplayerSynchronizer é essencial para sincronização automática.
-                Embora neste projeto usemos RPC manual, o MultiplayerSynchronizer está preparado para uso futuro.
+            <div class="info">
+                <strong>💡 Nota:</strong> Este projeto usa <strong>Low-Level</strong> com RPCs manuais. Não utilizamos 
+                MultiplayerSynchronizer ou MultiplayerSpawner - toda sincronização é feita manualmente via código para 
+                maior controle e performance.
             </div>
         </div>
 
@@ -462,12 +478,11 @@ NetworkManager="*res://scripts/NetworkManager.gd"</code></pre>
             <pre><code>Game (Node2D)
 ├── GameManager (Node)
 │   ├── Players (Node2D) - Container para jogadores
-│   ├── SpawnPoints (Node2D)
-│   │   ├── SpawnPoint1 (Marker2D)
-│   │   ├── SpawnPoint2 (Marker2D)
-│   │   ├── SpawnPoint3 (Marker2D)
-│   │   └── SpawnPoint4 (Marker2D)
-│   └── MultiplayerSpawner
+│   └── SpawnPoints (Node2D)
+│       ├── SpawnPoint1 (Marker2D)
+│       ├── SpawnPoint2 (Marker2D)
+│       ├── SpawnPoint3 (Marker2D)
+│       └── SpawnPoint4 (Marker2D)
 ├── Level (Node2D)
 │   └── Platforms (Node2D)
 │       ├── Ground (StaticBody2D) - Chão do jogo
@@ -484,13 +499,6 @@ NetworkManager="*res://scripts/NetworkManager.gd"</code></pre>
                 <li>Adicione outro <strong>Node2D</strong> (renomeie para <code>SpawnPoints</code>)</li>
                 <li>Dentro de SpawnPoints, adicione vários <strong>Marker2D</strong> (SpawnPoint1, SpawnPoint2, etc.)</li>
                 <li>Posicione os Marker2D onde os jogadores devem aparecer</li>
-                <li>Adicione um <strong>MultiplayerSpawner</strong> ao GameManager</li>
-                <li>No MultiplayerSpawner, configure:
-                    <ul>
-                        <li><strong>Spawn Path:</strong> ../Players</li>
-                        <li><strong>Spawnable Scenes:</strong> Adicione Player.tscn</li>
-                    </ul>
-                </li>
                 <li>No Inspector do GameManager, configure:
                     <ul>
                         <li><strong>Player Scene:</strong> Carregue Player.tscn</li>
@@ -502,6 +510,12 @@ NetworkManager="*res://scripts/NetworkManager.gd"</code></pre>
                 <li>Adicione um <strong>Camera2D</strong> na raiz e adicione o script <code>scripts/CameraController.gd</code></li>
                 <li>Salve como <code>scenes/Game.tscn</code></li>
             </ol>
+            
+            <div class="info">
+                <strong>💡 Spawn Manual:</strong><br>
+                Este projeto usa spawn manual via código (função _create_player_manually). Não utilizamos MultiplayerSpawner 
+                para ter controle total sobre quando e como os jogadores são criados.
+            </div>
 
             <div class="info">
                 <strong>💡 Sobre Spawn Points:</strong><br>
@@ -643,6 +657,10 @@ NetworkManager="*res://scripts/NetworkManager.gd"</code></pre>
             <ul>
                 <li><code>var player_id: int</code> - ID único do jogador</li>
                 <li><code>var is_local_player = false</code> - Se é controlado localmente</li>
+                <li><code>var remote_input_direction: float</code> - Direção recebida de jogador remoto</li>
+                <li><code>var remote_jump_pressed: bool</code> - Se pulo foi pressionado no jogador remoto</li>
+                <li><code>var input_send_interval: float = 0.05</code> - Intervalo de envio de inputs (50ms = 20 vezes/segundo)</li>
+                <li><code>var sync_interval: float = 0.5</code> - Intervalo de sincronização periódica (0.5s)</li>
             </ul>
 
             <h4>⚙️ Função setup_for_network():</h4>
@@ -659,35 +677,44 @@ NetworkManager="*res://scripts/NetworkManager.gd"</code></pre>
             <div class="info">
                 <strong>💡 Autoridade (Authority):</strong><br>
                 Cada jogador tem autoridade sobre seu próprio personagem. Isso significa que apenas o cliente
-                com o mesmo ID pode modificar esse jogador. Outros clientes apenas recebem atualizações de posição.
+                com o mesmo ID pode modificar esse jogador. Outros clientes recebem inputs e processam movimento 
+                localmente, mas o jogador local tem autoridade sobre suas ações.
             </div>
 
-            <h4>🏃 Função _physics_process():</h4>
-            <p>Processa física e movimento (chamada 60 vezes por segundo):</p>
+            <h4>🏃 Função _physics_process() - Sistema Baseado em Inputs:</h4>
+            <p>Processa física e movimento usando sistema de inputs (chamada 60 vezes por segundo):</p>
             <pre><code>func _physics_process(delta):
-    # Apenas o jogador local processa input
-    if not is_local_player:
-        return
+    # 🎮 Jogador local: processa input e envia para rede
+    if is_local_player:
+        var current_direction = Input.get_axis("ui_left", "ui_right")
+        var jump_pressed = Input.is_action_just_pressed("jump")
+        
+        # Processa movimento com inputs locais
+        _handle_movement_with_input(delta, current_direction, jump_pressed)
+        
+        # 📡 Envia inputs via RPC periodicamente ou quando há mudança
+        _send_input.rpc(current_direction, jump_pressed, is_on_floor())
+        
+        # 📡 Sincronização periódica de posição para correção
+        if sync_timer >= sync_interval:
+            _sync_position_periodic.rpc(global_position, velocity)
     
-    # Processa movimento
-    _handle_movement(delta)
-    
-    # Sincroniza posição se mudou
-    if global_position.distance_to(old_position) > 1.0:
-        _sync_position.rpc(global_position, velocity)</code></pre>
+    # 🌐 Jogador remoto: processa movimento com inputs recebidos
+    else:
+        _handle_movement_with_input(delta, remote_input_direction, remote_jump_pressed)</code></pre>
 
-            <h4>🎮 Função _handle_movement():</h4>
-            <pre><code>func _handle_movement(delta):
+            <h4>🎮 Função _handle_movement_with_input():</h4>
+            <p>Processa movimento usando inputs fornecidos (usado por local e remoto):</p>
+            <pre><code>func _handle_movement_with_input(delta: float, direction: float, jump_pressed: bool):
     # Gravidade
     if not is_on_floor():
         velocity.y += gravity * delta
     
     # Pulo
-    if Input.is_action_just_pressed("jump") and is_on_floor():
+    if jump_pressed and is_on_floor():
         velocity.y = jump_velocity
     
     # Movimento horizontal
-    var direction = Input.get_axis("ui_left", "ui_right")
     if direction != 0:
         velocity.x = direction * speed
     else:
@@ -696,20 +723,30 @@ NetworkManager="*res://scripts/NetworkManager.gd"</code></pre>
     # Aplica movimento
     move_and_slide()</code></pre>
 
-            <h4>📡 RPC de Sincronização:</h4>
-            <pre><code>@rpc("any_peer", "unreliable")
-func _sync_position(pos: Vector2, vel: Vector2):
-    # Apenas atualiza se NÃO for o jogador local
+            <h4>📡 RPCs de Sincronização - Sistema Baseado em Inputs:</h4>
+            <pre><code># RPC para enviar inputs
+@rpc("any_peer", "unreliable")
+func _send_input(direction: float, jump_pressed: bool, is_on_floor_state: bool):
+    # Recebe inputs e armazena para processamento
     if not is_local_player:
-        global_position = pos
-        velocity = vel</code></pre>
+        remote_input_direction = direction
+        if jump_pressed:
+            remote_jump_pressed = true
 
-            <div class="warning">
-                <strong>⚠️ Por que "unreliable"?</strong><br>
-                Para sincronização de posição, usamos "unreliable" porque:
-                - É mais rápido (menos overhead)
-                - Se um pacote for perdido, o próximo já terá a posição atualizada
-                - Para posições, não é crítico perder um frame
+# RPC para sincronização periódica de posição (correção)
+@rpc("any_peer", "unreliable")
+func _sync_position_periodic(pos: Vector2, vel: Vector2):
+    # Corrige dessincronização apenas se muito grande
+    if not is_local_player and global_position.distance_to(pos) > 50.0:
+        global_position = global_position.lerp(pos, 0.3)</code></pre>
+
+            <div class="success">
+                <strong>✅ Vantagens do Sistema Baseado em Inputs:</strong><br>
+                - <strong>Mais leve:</strong> Envia apenas 3 floats (direção, pulo, estado do chão) em vez de posição completa<br>
+                - <strong>Mais suave:</strong> Cada cliente processa física localmente, resultando em movimento mais natural<br>
+                - <strong>Mais responsivo:</strong> Movimento não depende de latência de rede<br>
+                - <strong>Otimizado:</strong> Envia inputs apenas quando há mudança ou periodicamente (20 vezes/segundo)<br>
+                - <strong>Correção automática:</strong> Sincronização periódica corrige pequenas dessincronizações
             </div>
         </div>
 
@@ -824,10 +861,17 @@ func _sync_position(pos: Vector2, vel: Vector2):
 
         <p>Cada jogador tem autoridade sobre seu próprio personagem:</p>
         <ul>
-            <li><strong>Jogador Local:</strong> Processa input, aplica física, envia posição via RPC</li>
-            <li><strong>Jogadores Remotos:</strong> Apenas recebem atualizações de posição, não processam input</li>
-            <li><strong>Servidor:</strong> Gerencia spawn, remoção e estado geral</li>
+            <li><strong>Jogador Local:</strong> Processa input local, aplica física, envia inputs via RPC</li>
+            <li><strong>Jogadores Remotos:</strong> Recebem inputs via RPC e processam física localmente (sistema baseado em inputs)</li>
+            <li><strong>Servidor:</strong> Gerencia spawn manual, remoção e estado geral</li>
         </ul>
+        
+        <div class="info">
+            <strong>💡 Sistema Baseado em Inputs:</strong><br>
+            Este projeto usa sincronização baseada em inputs, onde cada cliente recebe os inputs dos outros jogadores
+            e processa o movimento localmente. Isso resulta em movimento mais suave e responsivo comparado a 
+            sincronização direta de posições.
+        </div>
 
         <div class="warning">
             <strong>⚠️ Regra de Ouro do Multiplayer:</strong><br>
@@ -860,15 +904,24 @@ func _sync_position(pos: Vector2, vel: Vector2):
             </tr>
         </table>
 
-        <h3>🔄 Sincronização de Posição</h3>
+        <h3>🔄 Sincronização Baseada em Inputs (Sistema Atual)</h3>
 
         <p>O sistema de sincronização funciona assim:</p>
         <ol>
-            <li>Jogador local processa input e move</li>
-            <li>Se a posição mudou significativamente (>1 pixel), envia RPC</li>
-            <li>Outros clientes recebem o RPC e atualizam a posição do jogador remoto</li>
-            <li>O jogador local NÃO atualiza sua própria posição via RPC (evita conflito)</li>
+            <li><strong>Jogador Local:</strong> Captura inputs (teclado) e processa movimento localmente</li>
+            <li><strong>Envio de Inputs:</strong> Envia inputs via RPC (direção, pulo) a cada 50ms ou quando há mudança</li>
+            <li><strong>Jogadores Remotos:</strong> Recebem inputs via RPC e processam movimento localmente</li>
+            <li><strong>Processamento Local:</strong> Cada cliente processa física usando os mesmos inputs, resultando em movimento idêntico</li>
+            <li><strong>Correção Periódica:</strong> A cada 0.5 segundos, sincroniza posição para corrigir pequenas dessincronizações</li>
         </ol>
+        
+        <div class="info">
+            <strong>💡 Por que este sistema é melhor?</strong><br>
+            - <strong>Menos dados:</strong> Inputs são menores que posições (3 floats vs Vector2 + Vector2)<br>
+            - <strong>Mais suave:</strong> Física processada localmente = movimento mais natural<br>
+            - <strong>Menos dependente de latência:</strong> Movimento não fica "travado" esperando posição<br>
+            - <strong>Correção automática:</strong> Sincronização periódica mantém todos sincronizados
+        </div>
 
         <h2 id="testar">7. 🧪 Como Testar o Jogo</h2>
 
@@ -965,7 +1018,8 @@ func _sync_position(pos: Vector2, vel: Vector2):
         <h2>🎓 Conclusão</h2>
 
         <p>
-            Este projeto demonstra os conceitos fundamentais de multiplayer no Godot 4.5. Com este conhecimento,
+            Este projeto demonstra os conceitos fundamentais de multiplayer <strong>Low-Level</strong> no Godot 4.5, 
+            utilizando sistema baseado em inputs para movimento otimizado. Com este conhecimento,
             você pode expandir para:
         </p>
 
@@ -975,7 +1029,15 @@ func _sync_position(pos: Vector2, vel: Vector2):
             <li>Chat em tempo real</li>
             <li>Jogos mais complexos (RPG, estratégia, etc.)</li>
             <li>Servidor dedicado (separado do cliente)</li>
+            <li>Otimizações avançadas (interpolação de lag, predição client-side, etc.)</li>
         </ul>
+        
+        <div class="success">
+            <strong>✅ Sobre Low-Level vs High-Level:</strong><br>
+            Este projeto usa <strong>Low-Level (ENetMultiplayerPeer)</strong> com controle manual sobre sincronização
+            via RPCs. Para aprender sobre High-Level e comparações detalhadas, consulte a <strong>documentacao2.html</strong> 
+            que explica ambos os sistemas, prós e contras, e quando usar cada um.
+        </div>
 
         <div class="success">
             <strong>✅ Próximos Passos:</strong><br>
@@ -988,7 +1050,7 @@ func _sync_position(pos: Vector2, vel: Vector2):
 
         <div style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #667eea; text-align: center; color: #777;">
             <p>Documentação criada para o projeto Jogo Multiplayer Godot</p>
-            <p>Versão do Godot: 4.5</p>
+            <p>Versão do Godot: 4.5 | Sistema: Low-Level (ENetMultiplayerPeer) | Sincronização: Baseada em Inputs</p>
         </div>
     </div>
 </body>

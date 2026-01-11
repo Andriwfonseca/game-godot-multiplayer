@@ -12,7 +12,6 @@ class_name Player
 # 📍 REFERÊNCIAS DOS NÓS (serão conectadas automaticamente)
 @onready var sprite = $Sprite2D
 @onready var collision = $CollisionShape2D
-@onready var multiplayer_sync = $MultiplayerSynchronizer
 
 # 🌍 FÍSICA DO MUNDO
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
@@ -30,13 +29,6 @@ func _ready():
 	# 🎨 Aplica cor única para cada jogador
 	_set_player_color()
 
-	# ⚙️ Configuração será feita via setup_for_network()
-
-	# 🌐 CONFIGURAÇÃO MANUAL DE SINCRONIZAÇÃO
-	if multiplayer_sync and multiplayer and multiplayer.has_multiplayer_peer():
-		# Define quais propriedades sincronizar
-		multiplayer_sync.set_multiplayer_authority(multiplayer.get_unique_id())
-		print("🔗 Sincronização configurada para jogador: ", multiplayer.get_unique_id())
 
 func _set_player_color():
 	"""

@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação - Low-Level vs High-Level Multiplayer no Godot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #667eea;
+            border-bottom: 4px solid #764ba2;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #764ba2;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #667eea;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        h4 {
+            color: #777;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+            font-size: 0.9em;
+    }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        pre code {
+            background: transparent;
+            color: #f8f8f2;
+            padding: 0;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .danger {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .step {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .comparison-box {
+            border: 2px solid;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .low-level {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .high-level {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .toc ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .toc li {
+            margin: 10px 0;
+        }
+
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Low-Level vs High-Level Multiplayer no Godot</h1>
+
+        <div class="info">
+            <strong>📋 Sobre esta documentação:</strong><br>
+            Esta documentação explica as diferenças entre os sistemas <strong>Low-Level</strong> e <strong>High-Level</strong>
+            de multiplayer no Godot 4.5, mostrando como usar cada um, exemplos práticos, prós e contras.
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Sistema Atual do Projeto:</strong><br>
+            Este projeto está usando <strong>LOW-LEVEL (ENetMultiplayerPeer)</strong> com RPCs manuais.
+            Você verá MultiplayerSpawner e MultiplayerSynchronizer no projeto, mas eles não estão sendo
+            completamente utilizados (estão preparados para uso futuro).
+        </div>
+
+        <div class="toc">
+            <h2>📑 Índice</h2>
+            <ul>
+                <li><a href="#introducao">1. Introdução: O que são Low-Level e High-Level?</a></li>
+                <li><a href="#comparacao-geral">2. Comparação Geral</a></li>
+                <li><a href="#low-level">3. Sistema Low-Level (ENet)</a></li>
+                <li><a href="#high-level">4. Sistema High-Level (SceneMultiplayer)</a></li>
+                <li><a href="#exemplos">5. Exemplos Práticos Completos</a></li>
+                <li><a href="#pros-contras">6. Prós e Contras</a></li>
+                <li><a href="#quando-usar">7. Quando Usar Cada Um?</a></li>
+                <li><a href="#migracao">8. Como Migrar de Low-Level para High-Level</a></li>
+            </ul>
+        </div>
+
+        <h2 id="introducao">1. 📖 Introdução: O que são Low-Level e High-Level?</h2>
+
+        <h3>🔧 Low-Level (Baixo Nível)</h3>
+        <p>
+            <strong>Low-Level</strong> refere-se ao uso direto de <code>ENetMultiplayerPeer</code>, que é a API
+            fundamental de networking do Godot. Com Low-Level, você tem controle total sobre:
+        </p>
+        <ul>
+            <li>Criação de servidor e conexão de clientes</li>
+            <li>Gerenciamento manual de spawn de objetos</li>
+            <li>Sincronização manual via RPCs (Remote Procedure Calls)</li>
+            <li>Controle direto sobre autoridade (quem controla o quê)</li>
+            <li>Gerenciamento manual de estados de rede</li>
+        </ul>
+
+        <div class="success">
+            <strong>✅ Vantagem Principal:</strong> Controle total e flexibilidade máxima para casos complexos.
+        </div>
+
+        <h3>🎯 High-Level (Alto Nível)</h3>
+        <p>
+            <strong>High-Level</strong> refere-se ao uso de <code>SceneMultiplayer</code> combinado com
+            <code>MultiplayerSpawner</code> e <code>MultiplayerSynchronizer</code>. Com High-Level, o Godot
+            automatiza muitas tarefas:
+        </p>
+        <ul>
+            <li>Spawn automático de objetos entre clientes</li>
+            <li>Sincronização automática de propriedades (@replicated)</li>
+            <li>Gerenciamento automático de autoridade baseado em nós</li>
+            <li>Menos código para escrever e manter</li>
+            <li>Mais fácil para iniciantes</li>
+        </ul>
+
+        <div class="info">
+            <strong>💡 Nota Importante:</strong> High-Level ainda usa ENet por baixo dos panos, mas adiciona
+            uma camada de abstração que facilita o desenvolvimento.
+        </div>
+
+        <h2 id="comparacao-geral">2. ⚖️ Comparação Geral</h2>
+
+        <table>
+            <tr>
+                <th>Característica</th>
+                <th>Low-Level (ENet)</th>
+                <th>High-Level (SceneMultiplayer)</th>
+            </tr>
+            <tr>
+                <td><strong>Classe Base</strong></td>
+                <td><code>ENetMultiplayerPeer</code></td>
+                <td><code>SceneMultiplayer</code></td>
+            </tr>
+            <tr>
+                <td><strong>Spawn de Objetos</strong></td>
+                <td>Manual (você cria e gerencia)</td>
+                <td>Automático (MultiplayerSpawner)</td>
+            </tr>
+            <tr>
+                <td><strong>Sincronização</strong></td>
+                <td>Manual via RPCs</td>
+                <td>Automática (MultiplayerSynchronizer)</td>
+            </tr>
+            <tr>
+                <td><strong>Complexidade</strong></td>
+                <td>Alta (mais código)</td>
+                <td>Baixa (menos código)</td>
+            </tr>
+            <tr>
+                <td><strong>Controle</strong></td>
+                <td>Total (máxima flexibilidade)</td>
+                <td>Limitado (facilita, mas restringe)</td>
+            </tr>
+            <tr>
+                <td><strong>Performance</strong></td>
+                <td>Ótima (sem overhead extra)</td>
+                <td>Boa (pequeno overhead de abstração)</td>
+            </tr>
+            <tr>
+                <td><strong>Aprendizado</strong></td>
+                <td>Difícil (precisa entender networking)</td>
+                <td>Fácil (mais intuitivo)</td>
+            </tr>
+            <tr>
+                <td><strong>Casos de Uso</strong></td>
+                <td>Projetos complexos, jogos competitivos</td>
+                <td>Prototipagem rápida, jogos casuais</td>
+            </tr>
+        </table>
+
+        <h2 id="low-level">3. 🔧 Sistema Low-Level (ENetMultiplayerPeer)</h2>
+
+        <div class="low-level comparison-box">
+            <h3>📦 O que é ENet?</h3>
+            <p>
+                <strong>ENet</strong> é uma biblioteca de networking UDP confiável. No Godot, <code>ENetMultiplayerPeer</code>
+                é a implementação direta dessa biblioteca. Você trabalha diretamente com a API de baixo nível.
+            </p>
+        </div>
+
+        <h3>🏗️ Arquitetura Low-Level</h3>
+        <ol>
+            <li><strong>NetworkManager</strong> cria o servidor/cliente usando ENetMultiplayerPeer</li>
+            <li><strong>GameManager</strong> spawna jogadores manualmente quando detecta conexão</li>
+            <li><strong>Player</strong> envia posições via RPCs manuais</li>
+            <li><strong>Autoridade</strong> é gerenciada manualmente com set_multiplayer_authority()</li>
+        </ol>
+
+        <h3>💻 Como Usar Low-Level</h3>
+
+        <div class="step">
+            <h4><span class="step-number">1</span> Criar Servidor (Host)</h4>
+            <pre><code># NetworkManager.gd
+extends Node
+
+const PORT = 7000
+const MAX_PLAYERS = 8
+
+func host_game():
+    # Cria o peer usando ENet diretamente
+    var peer = ENetMultiplayerPeer.new()
+    var error = peer.create_server(PORT, MAX_PLAYERS)
+    
+    if error != OK:
+        print("Erro ao criar servidor: ", error)
+        return false
+    
+    # Define como multiplayer ativo
+    multiplayer.multiplayer_peer = peer
+    
+    # Conecta sinais
+    multiplayer.peer_connected.connect(_on_player_connected)
+    multiplayer.peer_disconnected.connect(_on_player_disconnected)
+    
+    print("Servidor criado na porta: ", PORT)
+    return true
+
+func _on_player_connected(peer_id: int):
+    print("Jogador conectado: ", peer_id)
+    # Você precisa spawnar o jogador manualmente aqui</code></pre>
+        </div>
+
+        <div class="step">
+            <h4><span class="step-number">2</span> Conectar como Cliente</h4>
+            <pre><code># NetworkManager.gd
+func join_game(ip: String, port: int = PORT):
+    # Cria o peer como cliente
+    var peer = ENetMultiplayerPeer.new()
+    var error = peer.create_client(ip, port)
+    
+    if error != OK:
+        print("Erro ao conectar: ", error)
+        return false
+    
+    # Define como multiplayer ativo
+    multiplayer.multiplayer_peer = peer
+    
+    # Conecta sinais
+    multiplayer.connected_to_server.connect(_on_connected_to_server)
+    multiplayer.connection_failed.connect(_on_connection_failed)
+    
+    print("Conectando a ", ip, ":", port)
+    return true
+
+func _on_connected_to_server():
+    print("Conectado ao servidor!")
+
+func _on_connection_failed():
+    print("Falha na conexão!")</code></pre>
+        </div>
+
+        <div class="step">
+            <h4><span class="step-number">3</span> Spawn Manual de Jogadores</h4>
+            <pre><code># GameManager.gd
+extends Node
+
+@export var player_scene: PackedScene
+
+func _on_player_connected(peer_id: int):
+    # Você precisa criar o jogador manualmente
+    if multiplayer.is_server():
+        _spawn_player(peer_id)
+
+func _spawn_player(peer_id: int):
+    # Instancia o jogador
+    var player = player_scene.instantiate()
+    
+    # Configura autoridade manualmente
+    player.set_multiplayer_authority(peer_id)
+    player.player_id = peer_id
+    
+    # Define se é local
+    player.is_local = (peer_id == multiplayer.get_unique_id())
+    
+    # Adiciona à cena
+    $Players.add_child(player, true)
+    player.name = "Player_" + str(peer_id)
+    
+    # Notifica clientes via RPC
+    _notify_player_spawned.rpc(peer_id, player.position)
+
+@rpc("authority", "call_local", "reliable")
+func _notify_player_spawned(peer_id: int, pos: Vector2):
+    # Clientes também criam o jogador localmente
+    if not multiplayer.is_server():
+        _spawn_player_locally(peer_id, pos)</code></pre>
+        </div>
+
+        <div class="step">
+            <h4><span class="step-number">4</span> Sincronização Manual via RPC</h4>
+            <pre><code># Player.gd
+extends CharacterBody2D
+
+var player_id: int
+var is_local: bool
+
+func _physics_process(delta):
+    # Apenas jogador local processa input
+    if not is_local:
+        return
+    
+    # Processa movimento
+    _handle_movement(delta)
+    
+    # Envia posição via RPC manual
+    if position_changed:
+        _sync_position.rpc(position, velocity)
+
+@rpc("any_peer", "unreliable")
+func _sync_position(pos: Vector2, vel: Vector2):
+    # Apenas atualiza se não for o jogador local
+    if not is_local:
+        global_position = pos
+        velocity = vel</code></pre>
+        </div>
+
+        <h3>🎯 Características do Low-Level</h3>
+        <ul>
+            <li><strong>Controle Total:</strong> Você decide quando e como spawnar objetos</li>
+            <li><strong>RPCs Manuais:</strong> Você define quais propriedades sincronizar e quando</li>
+            <li><strong>Autoridade Manual:</strong> Você controla quem tem autoridade sobre cada objeto</li>
+            <li><strong>Mais Código:</strong> Precisa escrever mais código para gerenciar tudo</li>
+            <li><strong>Mais Flexível:</strong> Pode criar sistemas personalizados complexos</li>
+        </ul>
+
+        <div class="warning">
+            <strong>⚠️ Cuidados com Low-Level:</strong><br>
+            - Você é responsável por gerenciar todos os objetos na rede<br>
+            - Precisa garantir que todos os clientes estejam sincronizados<br>
+            - Erros podem causar dessincronização entre clientes<br>
+            - Mais difícil de debugar
+        </div>
+
+        <h2 id="high-level">4. 🎯 Sistema High-Level (SceneMultiplayer)</h2>
+
+        <div class="high-level comparison-box">
+            <h3>📦 O que é SceneMultiplayer?</h3>
+            <p>
+                <strong>SceneMultiplayer</strong> é uma API de alto nível que usa ENet por baixo dos panos, mas adiciona
+                abstrações como <code>MultiplayerSpawner</code> e <code>MultiplayerSynchronizer</code> para automatizar
+                tarefas comuns de multiplayer.
+            </p>
+        </div>
+
+        <h3>🏗️ Arquitetura High-Level</h3>
+        <ol>
+            <li><strong>NetworkManager</strong> cria o servidor/cliente usando SceneMultiplayer</li>
+            <li><strong>MultiplayerSpawner</strong> spawna objetos automaticamente</li>
+            <li><strong>MultiplayerSynchronizer</strong> sincroniza propriedades automaticamente</li>
+            <li><strong>Autoridade</strong> é gerenciada automaticamente baseada no nó</li>
+        </ol>
+
+        <h3>💻 Como Usar High-Level</h3>
+
+        <div class="step">
+            <h4><span class="step-number">1</span> Criar Servidor (Host)</h4>
+            <pre><code># NetworkManager.gd
+extends Node
+
+const PORT = 7000
+const MAX_PLAYERS = 8
+
+func host_game():
+    # Cria o multiplayer usando SceneMultiplayer
+    var peer = ENetMultiplayerPeer.new()
+    var error = peer.create_server(PORT, MAX_PLAYERS)
+    
+    if error != OK:
+        print("Erro ao criar servidor: ", error)
+        return false
+    
+    # SceneMultiplayer gerencia tudo automaticamente
+    multiplayer.multiplayer_peer = peer
+    
+    # Conecta sinais (opcional, para feedback)
+    multiplayer.peer_connected.connect(_on_player_connected)
+    
+    print("Servidor criado na porta: ", PORT)
+    return true
+
+func _on_player_connected(peer_id: int):
+    print("Jogador conectado: ", peer_id)
+    # MultiplayerSpawner spawna automaticamente!</code></pre>
+
+            <div class="info">
+                <strong>💡 Nota:</strong> High-Level ainda usa ENetMultiplayerPeer, mas trabalha com
+                SceneMultiplayer que adiciona funcionalidades automáticas.
+            </div>
+        </div>
+
+        <div class="step">
+            <h4><span class="step-number">2</span> Configurar MultiplayerSpawner (No Editor)</h4>
+            <p><strong>No Editor do Godot:</strong></p>
+            <ol>
+                <li>Selecione o nó GameManager na cena Game.tscn</li>
+                <li>Adicione um nó <strong>MultiplayerSpawner</strong> como filho</li>
+                <li>No Inspector do MultiplayerSpawner:
+                    <ul>
+                        <li><strong>Spawn Path:</strong> ../Players (caminho para o container)</li>
+                        <li><strong>Spawnable Scenes:</strong> Clique em "Add" e selecione Player.tscn</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <p><strong>Em Código (alternativa):</strong></p>
+            <pre><code># GameManager.gd
+@onready var multiplayer_spawner = $MultiplayerSpawner
+
+func _ready():
+    # Configura o spawner
+    multiplayer_spawner.spawn_path = NodePath("../Players")
+    
+    # Adiciona Player.tscn à lista de spawnable
+    var player_scene = preload("res://scenes/Player.tscn")
+    # O spawner já está configurado no editor</code></pre>
+        </div>
+
+        <div class="step">
+            <h4><span class="step-number">3</span> Spawn Automático com MultiplayerSpawner</h4>
+            <pre><code># GameManager.gd
+extends Node
+
+@export var player_scene: PackedScene
+@onready var multiplayer_spawner = $MultiplayerSpawner
+@onready var players_container = $Players
+
+func _ready():
+    # MultiplayerSpawner já está configurado no editor
+    # Ele spawna automaticamente quando você chama spawn()
+
+func _on_player_connected(peer_id: int):
+    if multiplayer.is_server():
+        # Spawn automático! O spawner cuida de tudo
+        var player = player_scene.instantiate()
+        player.name = "Player_" + str(peer_id)
+        
+        # O MultiplayerSpawner automaticamente:
+        # - Sincroniza o spawn em todos os clientes
+        # - Configura autoridade corretamente
+        # - Gerencia remoção quando desconecta
+        
+        multiplayer_spawner.spawn(player)
+        
+        # Ou ainda mais simples - adicione à cena e o spawner detecta
+        players_container.add_child(player, true)</code></pre>
+
+            <div class="success">
+                <strong>✅ Vantagem:</strong> Com High-Level, você não precisa criar RPCs para sincronizar spawn.
+                O MultiplayerSpawner faz isso automaticamente!
+            </div>
+        </div>
+
+        <div class="step">
+            <h4><span class="step-number">4</span> Sincronização Automática com MultiplayerSynchronizer</h4>
+
+            <p><strong>No Editor do Godot:</strong></p>
+            <ol>
+                <li>Selecione o nó Player na cena Player.tscn</li>
+                <li>Adicione um nó <strong>MultiplayerSynchronizer</strong> como filho</li>
+                <li>No Inspector do MultiplayerSynchronizer:
+                    <ul>
+                        <li>Clique em "Replication Config" → "New SceneReplicationConfig"</li>
+                        <li>Na aba "Properties", clique em "Add"</li>
+                        <li>Selecione as propriedades para sincronizar (ex: position, velocity)</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <p><strong>Em Código:</strong></p>
+            <pre><code># Player.gd
+extends CharacterBody2D
+
+@export var speed = 300.0
+@export var jump_velocity = -400.0
+
+# MultiplayerSynchronizer sincroniza estas propriedades automaticamente
+# Não precisa de RPCs manuais!
+
+func _physics_process(delta):
+    # Apenas processa se tiver autoridade
+    if not multiplayer.is_authority_of_multiplayer_authority():
+        return  # Outro cliente controla este jogador
+    
+    # Processa movimento normalmente
+    _handle_movement(delta)
+    
+    # MultiplayerSynchronizer sincroniza position e velocity automaticamente!
+    # Não precisa chamar RPCs!
+
+func _handle_movement(delta):
+    if not is_on_floor():
+        velocity.y += gravity * delta
+    
+    if Input.is_action_just_pressed("jump") and is_on_floor():
+        velocity.y = jump_velocity
+    
+    var direction = Input.get_axis("left", "right")
+    if direction != 0:
+        velocity.x = direction * speed
+    else:
+        velocity.x = move_toward(velocity.x, 0, speed)
+    
+    move_and_slide()</code></pre>
+
+            <div class="info">
+                <strong>💡 Como funciona:</strong><br>
+                O MultiplayerSynchronizer monitora as propriedades selecionadas e as sincroniza automaticamente
+                entre todos os clientes. Você não precisa escrever código de sincronização!
+            </div>
+        </div>
+
+        <div class="step">
+            <h4><span class="step-number">5</span> Configurar Autoridade no High-Level</h4>
+            <pre><code># Player.gd
+extends CharacterBody2D
+
+func _ready():
+    # Define autoridade baseado no player_id
+    # No High-Level, isso é mais simples
+    if multiplayer.has_multiplayer_peer():
+        var my_id = multiplayer.get_unique_id()
+        set_multiplayer_authority(my_id)
+    
+    # O MultiplayerSynchronizer respeita a autoridade automaticamente
+
+func _physics_process(delta):
+    # Verifica autoridade de forma simples
+    if multiplayer.is_authority_of_multiplayer_authority():
+        # Este cliente tem autoridade, processa input
+        _handle_movement(delta)
+    # Caso contrário, apenas recebe sincronizações</code></pre>
+        </div>
+
+        <h3>🎯 Características do High-Level</h3>
+        <ul>
+            <li><strong>Spawn Automático:</strong> MultiplayerSpawner gerencia spawn/removal</li>
+            <li><strong>Sincronização Automática:</strong> MultiplayerSynchronizer sincroniza propriedades</li>
+            <li><strong>Menos Código:</strong> Muito menos código para escrever</li>
+            <li><strong>Mais Fácil:</strong> Ideal para iniciantes</li>
+            <li><strong>Menos Flexível:</strong> Pode ser limitante para casos complexos</li>
+        </ul>
+
+        <div class="success">
+            <strong>✅ Vantagem do High-Level:</strong><br>
+            Você pode criar um jogo multiplayer funcional com muito menos código. O Godot cuida de
+            sincronização, spawn e remoção automaticamente.
+        </div>
+
+        <h2 id="exemplos">5. 📝 Exemplos Práticos Completos</h2>
+
+        <h3>🔧 Exemplo Completo Low-Level (Atual do Projeto)</h3>
+
+        <div class="step">
+            <h4>NetworkManager.gd (Low-Level)</h4>
+            <pre><code># NetworkManager.gd - LOW-LEVEL
+extends Node
+
+const PORT = 7000
+const MAX_PLAYERS = 8
+
+signal player_connected(peer_id)
+signal player_disconnected(peer_id)
+
+func host_game():
+    # Cria servidor usando ENet diretamente
+    var peer = ENetMultiplayerPeer.new()
+    var error = peer.create_server(PORT, MAX_PLAYERS)
+    
+    if error != OK:
+        return false
+    
+    multiplayer.multiplayer_peer = peer
+    multiplayer.peer_connected.connect(_on_player_connected)
+    multiplayer.peer_disconnected.connect(_on_player_disconnected)
+    
+    return true
+
+func join_game(ip: String, port: int = PORT):
+    # Conecta como cliente
+    var peer = ENetMultiplayerPeer.new()
+    var error = peer.create_client(ip, port)
+    
+    if error != OK:
+        return false
+    
+    multiplayer.multiplayer_peer = peer
+    return true
+
+func _on_player_connected(peer_id: int):
+    player_connected.emit(peer_id)
+
+func _on_player_disconnected(peer_id: int):
+    player_disconnected.emit(peer_id)</code></pre>
+        </div>
+
+        <div class="step">
+            <h4>GameManager.gd (Low-Level - Spawn Manual)</h4>
+            <pre><code># GameManager.gd - LOW-LEVEL
+extends Node
+
+@export var player_scene: PackedScene
+@onready var players_container = $Players
+
+func _ready():
+    NetworkManager.player_connected.connect(_on_player_connected)
+    NetworkManager.player_disconnected.connect(_on_player_disconnected)
+
+func _on_player_connected(peer_id: int):
+    if multiplayer.is_server():
+        # Spawn manual
+        _create_player_manually(peer_id)
+
+func _create_player_manually(peer_id: int):
+    var player = player_scene.instantiate()
+    player.setup_for_network(peer_id, false)
+    player.name = "Player_" + str(peer_id)
+    players_container.add_child(player)
+    
+    # Notifica clientes via RPC manual
+    _notify_player_spawned.rpc(peer_id, player.position)
+
+@rpc("authority", "call_local", "reliable")
+func _notify_player_spawned(peer_id: int, pos: Vector2):
+    # Clientes também criam localmente
+    if not multiplayer.is_server():
+        var player = player_scene.instantiate()
+        player.setup_for_network(peer_id, peer_id == multiplayer.get_unique_id())
+        player.position = pos
+        player.name = "Player_" + str(peer_id)
+        players_container.add_child(player)</code></pre>
+        </div>
+
+        <div class="step">
+            <h4>Player.gd (Low-Level - RPC Manual)</h4>
+            <pre><code># Player.gd - LOW-LEVEL
+extends CharacterBody2D
+
+var player_id: int
+var is_local: bool
+
+func _physics_process(delta):
+    if not is_local:
+        return  # Apenas local processa
+    
+    _handle_movement(delta)
+    
+    # Sincroniza manualmente via RPC
+    _sync_position.rpc(global_position, velocity)
+
+@rpc("any_peer", "unreliable")
+func _sync_position(pos: Vector2, vel: Vector2):
+    if not is_local:
+        global_position = pos
+        velocity = vel
+
+func setup_for_network(id: int, local: bool):
+    player_id = id
+    is_local = local
+    set_multiplayer_authority(id)</code></pre>
+        </div>
+
+        <h3>🎯 Exemplo Completo High-Level</h3>
+
+        <div class="step">
+            <h4>NetworkManager.gd (High-Level - Similar)</h4>
+            <pre><code># NetworkManager.gd - HIGH-LEVEL
+extends Node
+
+const PORT = 7000
+const MAX_PLAYERS = 8
+
+signal player_connected(peer_id)
+
+func host_game():
+    # Ainda usa ENet, mas SceneMultiplayer gerencia tudo
+    var peer = ENetMultiplayerPeer.new()
+    var error = peer.create_server(PORT, MAX_PLAYERS)
+    
+    if error != OK:
+        return false
+    
+    multiplayer.multiplayer_peer = peer
+    multiplayer.peer_connected.connect(_on_player_connected)
+    
+    return true
+
+func join_game(ip: String, port: int = PORT):
+    var peer = ENetMultiplayerPeer.new()
+    var error = peer.create_client(ip, port)
+    
+    if error != OK:
+        return false
+    
+    multiplayer.multiplayer_peer = peer
+    return true
+
+func _on_player_connected(peer_id: int):
+    player_connected.emit(peer_id)
+    # MultiplayerSpawner spawna automaticamente!</code></pre>
+        </div>
+
+        <div class="step">
+            <h4>GameManager.gd (High-Level - Spawn Automático)</h4>
+            <pre><code># GameManager.gd - HIGH-LEVEL
+extends Node
+
+@export var player_scene: PackedScene
+@onready var multiplayer_spawner = $MultiplayerSpawner
+@onready var players_container = $Players
+
+func _ready():
+    # MultiplayerSpawner já está configurado no editor
+    # Spawn Path: ../Players
+    # Spawnable Scenes: Player.tscn
+    
+    NetworkManager.player_connected.connect(_on_player_connected)
+
+func _on_player_connected(peer_id: int):
+    if multiplayer.is_server():
+        # Spawn automático! MultiplayerSpawner cuida de tudo
+        var player = player_scene.instantiate()
+        player.name = "Player_" + str(peer_id)
+        
+        # O spawner sincroniza automaticamente em todos os clientes
+        players_container.add_child(player, true)
+        
+        # Não precisa de RPCs manuais!</code></pre>
+        </div>
+
+        <div class="step">
+            <h4>Player.gd (High-Level - Sincronização Automática)</h4>
+            <pre><code># Player.gd - HIGH-LEVEL
+extends CharacterBody2D
+
+@export var speed = 300.0
+@export var jump_velocity = -400.0
+
+# MultiplayerSynchronizer (configurado no editor) sincroniza:
+# - position
+# - velocity
+# Automaticamente! Sem RPCs manuais!
+
+func _ready():
+    # Define autoridade
+    if multiplayer.has_multiplayer_peer():
+        set_multiplayer_authority(multiplayer.get_unique_id())
+
+func _physics_process(delta):
+    # Verifica autoridade
+    if not multiplayer.is_authority_of_multiplayer_authority():
+        return  # Outro cliente controla
+    
+    # Processa movimento normalmente
+    _handle_movement(delta)
+    
+    # MultiplayerSynchronizer sincroniza automaticamente!
+    # Não precisa de _sync_position.rpc()
+
+func _handle_movement(delta):
+    if not is_on_floor():
+        velocity.y += gravity * delta
+    
+    if Input.is_action_just_pressed("jump") and is_on_floor():
+        velocity.y = jump_velocity
+    
+    var direction = Input.get_axis("left", "right")
+    if direction != 0:
+        velocity.x = direction * speed
+    else:
+        velocity.x = move_toward(velocity.x, 0, speed)
+    
+    move_and_slide()</code></pre>
+
+            <div class="info">
+                <strong>💡 Configuração no Editor:</strong><br>
+                1. Adicione MultiplayerSynchronizer ao Player<br>
+                2. Configure ReplicationConfig<br>
+                3. Adicione "position" e "velocity" às propriedades replicadas<br>
+                4. Pronto! Sincronização automática funcionando!
+            </div>
+        </div>
+
+        <h2 id="pros-contras">6. ✅❌ Prós e Contras</h2>
+
+        <div class="comparison">
+            <div class="low-level comparison-box">
+                <h3>🔧 LOW-LEVEL (ENet)</h3>
+                
+                <h4>✅ Prós:</h4>
+                <ul>
+                    <li><strong>Controle Total:</strong> Você decide exatamente o que acontece</li>
+                    <li><strong>Performance Máxima:</strong> Sem overhead de abstração</li>
+                    <li><strong>Flexibilidade:</strong> Pode criar sistemas personalizados</li>
+                    <li><strong>Debugging Direto:</strong> Você vê exatamente o que está sendo enviado</li>
+                    <li><strong>Casos Complexos:</strong> Ideal para jogos competitivos</li>
+                    <li><strong>Otimização Fina:</strong> Pode otimizar cada aspecto</li>
+                    <li><strong>Controle de Latência:</strong> Pode implementar técnicas avançadas</li>
+                </ul>
+                
+                <h4>❌ Contras:</h4>
+                <ul>
+                    <li><strong>Mais Código:</strong> Precisa escrever muito mais</li>
+                    <li><strong>Mais Complexo:</strong> Requer conhecimento de networking</li>
+                    <li><strong>Mais Erros:</strong> Fácil esquecer sincronizar algo</li>
+                    <li><strong>Manutenção:</strong> Mais difícil de manter</li>
+                    <li><strong>Tempo:</strong> Leva mais tempo para implementar</li>
+                    <li><strong>Debugging Difícil:</strong> Problemas de sincronização são difíceis</li>
+                    <li><strong>Curva de Aprendizado:</strong> Mais difícil para iniciantes</li>
+                </ul>
+            </div>
+            
+            <div class="high-level comparison-box">
+                <h3>🎯 HIGH-LEVEL (SceneMultiplayer)</h3>
+                
+                <h4>✅ Prós:</h4>
+                <ul>
+                    <li><strong>Menos Código:</strong> Muito menos para escrever</li>
+                    <li><strong>Mais Fácil:</strong> Ideal para iniciantes</li>
+                    <li><strong>Rápido:</strong> Prototipagem rápida</li>
+                    <li><strong>Menos Erros:</strong> Godot cuida de sincronização</li>
+                    <li><strong>Manutenção:</strong> Mais fácil de manter</li>
+                    <li><strong>Automático:</strong> Spawn e sincronização automáticos</li>
+                    <li><strong>Bom para Começar:</strong> Perfeito para aprender</li>
+                </ul>
+                
+                <h4>❌ Contras:</h4>
+                <ul>
+                    <li><strong>Menos Controle:</strong> Limitado pelo que Godot oferece</li>
+                    <li><strong>Performance:</strong> Pequeno overhead de abstração</li>
+                    <li><strong>Menos Flexível:</strong> Difícil criar sistemas personalizados</li>
+                    <li><strong>Black Box:</strong> Não vê exatamente o que acontece</li>
+                    <li><strong>Casos Complexos:</strong> Pode ser limitante</li>
+                    <li><strong>Debugging:</strong> Pode ser difícil entender problemas</li>
+                    <li><strong>Dependência:</strong> Depende das decisões da engine</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2 id="quando-usar">7. 🎯 Quando Usar Cada Um?</h2>
+
+        <div class="step">
+            <h3>🔧 Use LOW-LEVEL quando:</h3>
+            <ul>
+                <li><strong>Jogo Competitivo:</strong> Precisa de controle total sobre latência</li>
+                <li><strong>Otimização Extrema:</strong> Precisa de performance máxima</li>
+                <li><strong>Sistema Personalizado:</strong> Precisa de mecânicas únicas de rede</li>
+                <li><strong>Experiência Avançada:</strong> Você entende bem networking</li>
+                <li><strong>Controle Fino:</strong> Precisa decidir exatamente quando sincronizar</li>
+                <li><strong>Jogos Complexos:</strong> MMO, jogos com muitos objetos</li>
+                <li><strong>Servidor Dedicado:</strong> Servidor separado do cliente</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>🎯 Use HIGH-LEVEL quando:</h3>
+            <ul>
+                <li><strong>Iniciante:</strong> Está aprendendo multiplayer</li>
+                <li><strong>Prototipagem:</strong> Quer testar ideias rapidamente</li>
+                <li><strong>Jogo Casual:</strong> Jogos simples, plataforma, puzzle</li>
+                <li><strong>Time Limitado:</strong> Precisa entregar rápido</li>
+                <li><strong>Menos Jogadores:</strong> Poucos jogadores simultâneos</li>
+                <li><strong>Casos Padrão:</strong> Casos que High-Level cobre bem</li>
+                <li><strong>Facilidade:</strong> Prefere simplicidade sobre controle</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <strong>💡 Dica:</strong> Muitos desenvolvedores começam com High-Level para prototipar e depois
+            migram para Low-Level quando precisam de mais controle ou performance.
+        </div>
+
+        <h2 id="migracao">8. 🔄 Como Migrar de Low-Level para High-Level</h2>
+
+        <div class="step">
+            <h3><span class="step-number">1</span> Passo 1: Configurar MultiplayerSpawner</h3>
+            <ol>
+                <li>Na cena Game.tscn, selecione GameManager</li>
+                <li>Adicione um nó <strong>MultiplayerSpawner</strong> (se ainda não existir)</li>
+                <li>No Inspector:
+                    <ul>
+                        <li><strong>Spawn Path:</strong> ../Players</li>
+                        <li><strong>Spawnable Scenes:</strong> Adicione Player.tscn</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">2</span> Passo 2: Remover Spawn Manual</h3>
+            <p><strong>Antes (Low-Level):</strong></p>
+            <pre><code>func _create_player_manually(peer_id: int):
+    var player = player_scene.instantiate()
+    player.setup_for_network(peer_id, false)
+    player.name = "Player_" + str(peer_id)
+    players_container.add_child(player)
+    _notify_player_spawned.rpc(peer_id, player.position)  # RPC manual</code></pre>
+
+            <p><strong>Depois (High-Level):</strong></p>
+            <pre><code>func _on_player_connected(peer_id: int):
+    if multiplayer.is_server():
+        var player = player_scene.instantiate()
+        player.name = "Player_" + str(peer_id)
+        # MultiplayerSpawner spawna automaticamente em todos os clientes!
+        players_container.add_child(player, true)
+        # Não precisa de RPC manual!</code></pre>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">3</span> Passo 3: Configurar MultiplayerSynchronizer</h3>
+            <ol>
+                <li>Na cena Player.tscn, selecione Player</li>
+                <li>Adicione um nó <strong>MultiplayerSynchronizer</strong> (se ainda não existir)</li>
+                <li>No Inspector:
+                    <ul>
+                        <li>Clique em "Replication Config" → "New SceneReplicationConfig"</li>
+                        <li>Na aba "Properties", clique em "Add"</li>
+                        <li>Selecione: <code>position</code>, <code>velocity</code></li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">4</span> Passo 4: Remover RPCs Manuais de Sincronização</h3>
+            <p><strong>Antes (Low-Level):</strong></p>
+            <pre><code>func _physics_process(delta):
+    if not is_local:
+        return
+    
+    _handle_movement(delta)
+    _sync_position.rpc(global_position, velocity)  # RPC manual
+
+@rpc("any_peer", "unreliable")
+func _sync_position(pos: Vector2, vel: Vector2):
+    if not is_local:
+        global_position = pos
+        velocity = vel</code></pre>
+
+            <p><strong>Depois (High-Level):</strong></p>
+            <pre><code>func _physics_process(delta):
+    if not multiplayer.is_authority_of_multiplayer_authority():
+        return  # Outro cliente controla
+    
+    _handle_movement(delta)
+    # MultiplayerSynchronizer sincroniza automaticamente!
+    # Não precisa de RPC manual!</code></pre>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">5</span> Passo 5: Atualizar Verificação de Autoridade</h3>
+            <p><strong>Antes (Low-Level):</strong></p>
+            <pre><code>var is_local: bool
+
+func setup_for_network(id: int, local: bool):
+    player_id = id
+    is_local = local
+    set_multiplayer_authority(id)
+
+func _physics_process(delta):
+    if not is_local:
+        return</code></pre>
+
+            <p><strong>Depois (High-Level):</strong></p>
+            <pre><code>func _ready():
+    if multiplayer.has_multiplayer_peer():
+        set_multiplayer_authority(multiplayer.get_unique_id())
+
+func _physics_process(delta):
+    if not multiplayer.is_authority_of_multiplayer_authority():
+        return</code></pre>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Importante:</strong> Após migrar, teste cuidadosamente! High-Level funciona diferente
+            de Low-Level em alguns aspectos. Sempre teste com múltiplos clientes.
+        </div>
+
+        <h2>🎓 Conclusão</h2>
+
+        <div class="info">
+            <strong>📊 Resumo:</strong><br>
+            - <strong>Low-Level (ENet):</strong> Controle total, mais código, mais flexível, mais complexo<br>
+            - <strong>High-Level (SceneMultiplayer):</strong> Automático, menos código, mais fácil, menos flexível
+        </div>
+
+        <div class="success">
+            <strong>✅ Recomendação:</strong><br>
+            Para este projeto (jogo multiplayer 2D de plataforma), ambos funcionam bem. O projeto atual
+            usa Low-Level, o que é bom para aprendizado e controle. Se quiser simplificar, pode migrar
+            para High-Level usando MultiplayerSpawner e MultiplayerSynchronizer.
+        </div>
+
+        <div style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #667eea; text-align: center; color: #777;">
+            <p>Documentação criada para o projeto Jogo Multiplayer Godot</p>
+            <p>Godot 4.5 - Low-Level vs High-Level Multiplayer</p>
+        </div>
+    </div>
+</body>
+</html>

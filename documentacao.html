@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação - Jogo Multiplayer Godot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #667eea;
+            border-bottom: 4px solid #764ba2;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #764ba2;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #667eea;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        h4 {
+            color: #777;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        pre code {
+            background: transparent;
+            color: #f8f8f2;
+            padding: 0;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .step {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .toc ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .toc li {
+            margin: 10px 0;
+        }
+
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .file-structure {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Documentação Completa - Jogo Multiplayer 2D no Godot</h1>
+
+        <div class="info">
+            <strong>📋 Sobre este projeto:</strong><br>
+            Este é um exemplo completo de como criar um jogo multiplayer 2D no Godot 4.5 usando o sistema nativo de multiplayer.
+            A documentação explica cada passo, desde a configuração no editor até o funcionamento do código.
+        </div>
+
+        <div class="toc">
+            <h2>📑 Índice</h2>
+            <ul>
+                <li><a href="#visao-geral">1. Visão Geral do Projeto</a></li>
+                <li><a href="#estrutura">2. Estrutura de Arquivos</a></li>
+                <li><a href="#config-godot">3. Configurações no Godot</a></li>
+                <li><a href="#cenas">4. Criação das Cenas</a></li>
+                <li><a href="#scripts">5. Explicação dos Scripts</a></li>
+                <li><a href="#multiplayer">6. Como Funciona o Multiplayer</a></li>
+                <li><a href="#testar">7. Como Testar o Jogo</a></li>
+            </ul>
+        </div>
+
+        <h2 id="visao-geral">1. 📖 Visão Geral do Projeto</h2>
+
+        <p>
+            Este projeto implementa um jogo multiplayer 2D de plataforma onde múltiplos jogadores podem se conectar a um servidor
+            e jogar simultaneamente. O sistema utiliza a arquitetura cliente-servidor, onde um jogador hospeda o jogo (servidor/host)
+            e outros jogadores se conectam como clientes.
+        </p>
+
+        <h3>🎯 Funcionalidades Principais:</h3>
+        <ul>
+            <li><strong>Menu Principal:</strong> Interface para hospedar ou conectar-se a jogos</li>
+            <li><strong>Sistema de Rede:</strong> Gerenciamento de conexões usando ENet (protocolo UDP confiável)</li>
+            <li><strong>Spawn de Jogadores:</strong> Criação e sincronização de jogadores entre clientes</li>
+            <li><strong>Movimentação Sincronizada:</strong> Sincronização de posição e movimento dos jogadores</li>
+            <li><strong>Câmera Inteligente:</strong> Cada cliente segue apenas seu próprio jogador</li>
+            <li><strong>Física de Plataforma:</strong> Sistema básico de pulo e movimento horizontal</li>
+        </ul>
+
+        <h3>🏗️ Arquitetura:</h3>
+        <ul>
+            <li><strong>Servidor (Host):</strong> Gerencia o estado do jogo, cria e sincroniza jogadores</li>
+            <li><strong>Clientes:</strong> Enviam inputs do jogador e recebem atualizações do estado do jogo</li>
+            <li><strong>Autoridade:</strong> Cada jogador tem autoridade sobre seu próprio personagem</li>
+        </ul>
+
+        <h2 id="estrutura">2. 📁 Estrutura de Arquivos</h2>
+
+        <div class="file-structure">
+game-godot-multiplayer/
+├── project.godot          # Configurações do projeto
+├── scenes/                # Cenas do jogo
+│   ├── MainMenu.tscn      # Menu principal
+│   ├── Game.tscn          # Cena principal do jogo
+│   └── Player.tscn        # Cena do jogador
+├── scripts/               # Scripts GDScript
+│   ├── NetworkManager.gd  # Gerenciador de rede (AutoLoad)
+│   ├── GameManager.gd     # Gerenciador do jogo
+│   ├── Player.gd          # Script do jogador
+│   ├── MainMenu.gd        # Script do menu
+│   └── CameraController.gd # Controle da câmera
+└── icon.svg               # Ícone do projeto
+        </div>
+
+        <h2 id="config-godot">3. ⚙️ Configurações no Godot</h2>
+
+        <div class="step">
+            <h3><span class="step-number">1</span> Configurar o AutoLoad (NetworkManager)</h3>
+            
+            <p><strong>O que é AutoLoad?</strong> AutoLoad permite que um script seja carregado automaticamente em todas as cenas,
+            funcionando como um "singleton" global. Isso é perfeito para gerenciar conexões de rede que precisam existir
+            em todo o jogo.</p>
+
+            <p><strong>Como configurar:</strong></p>
+            <ol>
+                <li>No Godot, vá em <strong>Project → Project Settings</strong></li>
+                <li>Na aba esquerda, clique em <strong>AutoLoad</strong></li>
+                <li>No campo <strong>Path</strong>, clique no ícone de pasta e selecione: <code>res://scripts/NetworkManager.gd</code></li>
+                <li>No campo <strong>Node Name</strong>, digite: <code>NetworkManager</code></li>
+                <li>Clique no botão <strong>Add</strong> à direita</li>
+                <li>Clique em <strong>Close</strong></li>
+            </ol>
+
+            <div class="info">
+                <strong>💡 Por que isso é necessário?</strong><br>
+                O NetworkManager precisa estar disponível em todas as cenas (menu e jogo) para gerenciar conexões.
+                Sem o AutoLoad, teríamos que recriar o NetworkManager em cada cena, o que causaria problemas de sincronização.
+            </div>
+
+            <p><strong>Verificação:</strong> Após configurar, você pode verificar no arquivo <code>project.godot</code>:</p>
+            <pre><code>[autoload]
+
+NetworkManager="*res://scripts/NetworkManager.gd"</code></pre>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">2</span> Configurar a Cena Principal</h3>
+            
+            <p><strong>O que é a cena principal?</strong> É a primeira cena que será carregada quando o jogo iniciar.</p>
+
+            <p><strong>Como configurar:</strong></p>
+            <ol>
+                <li>Vá em <strong>Project → Project Settings</strong></li>
+                <li>Na aba <strong>Application → Run</strong></li>
+                <li>No campo <strong>Main Scene</strong>, clique no ícone de pasta</li>
+                <li>Selecione: <code>res://scenes/MainMenu.tscn</code></li>
+                <li>Clique em <strong>Close</strong></li>
+            </ol>
+
+            <div class="success">
+                <strong>✅ Verificação:</strong> No arquivo <code>project.godot</code>, você verá:<br>
+                <code>run/main_scene="res://scenes/MainMenu.tscn"</code>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">3</span> Configurar Inputs do Jogador</h3>
+            
+            <p><strong>O que são inputs?</strong> São as ações que o jogador pode realizar (mover, pular, etc.).</p>
+
+            <p><strong>Como configurar:</strong></p>
+            <ol>
+                <li>Vá em <strong>Project → Project Settings</strong></li>
+                <li>Na aba <strong>Input Map</strong></li>
+                <li>Configure os seguintes inputs (clique em <strong>Add</strong> para cada um):</li>
+            </ol>
+
+            <table>
+                <tr>
+                    <th>Nome do Input</th>
+                    <th>Tecla(s)</th>
+                    <th>Descrição</th>
+                </tr>
+                <tr>
+                    <td><code>ui_left</code></td>
+                    <td>A ou Seta Esquerda</td>
+                    <td>Mover para a esquerda</td>
+                </tr>
+                <tr>
+                    <td><code>ui_right</code></td>
+                    <td>D ou Seta Direita</td>
+                    <td>Mover para a direita</td>
+                </tr>
+                <tr>
+                    <td><code>left</code></td>
+                    <td>A ou Seta Esquerda</td>
+                    <td>Alternativa para esquerda</td>
+                </tr>
+                <tr>
+                    <td><code>right</code></td>
+                    <td>D ou Seta Direita</td>
+                    <td>Alternativa para direita</td>
+                </tr>
+                <tr>
+                    <td><code>jump</code></td>
+                    <td>Espaço, W ou Seta Cima</td>
+                    <td>Pular</td>
+                </tr>
+            </table>
+
+            <div class="warning">
+                <strong>⚠️ Nota:</strong> O projeto já vem com esses inputs configurados. Você só precisa verificar se estão corretos.
+            </div>
+        </div>
+
+        <h2 id="cenas">4. 🎬 Criação das Cenas</h2>
+
+        <div class="step">
+            <h3><span class="step-number">1</span> Cena MainMenu.tscn (Menu Principal)</h3>
+
+            <p><strong>Estrutura da cena:</strong></p>
+            <pre><code>MainMenu (Control)
+├── Background (ColorRect) - Fundo escuro
+├── MainPanel (Panel) - Painel principal
+│   └── VBoxContainer
+│       ├── Title (Label) - "Jogo Multiplayer 2D"
+│       ├── HSeparator
+│       ├── HostButton (Button) - "Hospedar Jogo"
+│       ├── JoinButton (Button) - "Conectar ao Jogo"
+│       ├── HSeparator2
+│       └── QuitButton (Button) - "Sair"
+├── JoinPanel (Panel) - Painel de conexão (invisível inicialmente)
+│   └── VBoxContainer
+│       ├── Title (Label) - "Conectar ao Servidor"
+│       ├── HSeparator
+│       ├── IPLabel (Label) - "Endereço IP:"
+│       ├── IPInput (LineEdit) - Campo de texto para IP
+│       ├── PortLabel (Label) - "Porta:"
+│       ├── PortInput (LineEdit) - Campo de texto para porta
+│       ├── HSeparator2
+│       └── HBoxContainer
+│           ├── ConnectButton (Button) - "Conectar"
+│           └── BackButton (Button) - "Voltar"
+└── StatusLabel (Label) - Mostra status na parte inferior</code></pre>
+
+            <p><strong>Como criar no Godot:</strong></p>
+            <ol>
+                <li>Crie uma nova cena (<strong>Scene → New Scene</strong>)</li>
+                <li>Adicione um nó <strong>Control</strong> como raiz (renomeie para <code>MainMenu</code>)</li>
+                <li>Adicione um <strong>ColorRect</strong> como filho (renomeie para <code>Background</code>)</li>
+                <li>Configure o Background para ocupar toda a tela (Anchors: Full Rect)</li>
+                <li>Adicione um <strong>Panel</strong> como filho (renomeie para <code>MainPanel</code>)</li>
+                <li>Centralize o MainPanel (Anchors: Center)</li>
+                <li>Adicione um <strong>VBoxContainer</strong> dentro do MainPanel</li>
+                <li>Adicione os botões e labels dentro do VBoxContainer</li>
+                <li>Repita o processo para o JoinPanel</li>
+                <li>Adicione o StatusLabel na raiz</li>
+                <li>Selecione o nó raiz (MainMenu) e adicione o script: <code>scripts/MainMenu.gd</code></li>
+                <li>Salve como <code>scenes/MainMenu.tscn</code></li>
+            </ol>
+
+            <div class="info">
+                <strong>💡 Dica:</strong> Use o sistema de anchors do Godot para posicionar elementos de forma responsiva.
+                O painel central deve usar anchors "Center" para ficar no meio da tela independente da resolução.
+            </div>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">2</span> Cena Player.tscn (Jogador)</h3>
+
+            <p><strong>Estrutura da cena:</strong></p>
+            <pre><code>Player (CharacterBody2D)
+├── Sprite2D - Visual do jogador
+├── CollisionShape2D - Forma de colisão (retângulo)
+└── MultiplayerSynchronizer - Sincronização multiplayer</code></pre>
+
+            <p><strong>Como criar no Godot:</strong></p>
+            <ol>
+                <li>Crie uma nova cena (<strong>Scene → New Scene</strong>)</li>
+                <li>Adicione um nó <strong>CharacterBody2D</strong> como raiz (renomeie para <code>Player</code>)</li>
+                <li>Adicione um <strong>Sprite2D</strong> como filho</li>
+                <li>No Sprite2D, carregue uma textura (pode usar o <code>icon.svg</code> temporariamente)</li>
+                <li>Ajuste o scale do Sprite2D (ex: 0.4, 0.6)</li>
+                <li>Adicione um <strong>CollisionShape2D</strong> como filho</li>
+                <li>No CollisionShape2D, crie um novo <strong>RectangleShape2D</strong> (Shape → New RectangleShape2D)</li>
+                <li>Ajuste o tamanho do retângulo para coincidir com o sprite</li>
+                <li>Adicione um <strong>MultiplayerSynchronizer</strong> como filho</li>
+                <li>No MultiplayerSynchronizer, crie um <strong>SceneReplicationConfig</strong></li>
+                <li>Selecione o nó raiz (Player) e adicione o script: <code>scripts/Player.gd</code></li>
+                <li>Salve como <code>scenes/Player.tscn</code></li>
+            </ol>
+
+            <div class="warning">
+                <strong>⚠️ Importante:</strong> O MultiplayerSynchronizer é essencial para sincronização automática.
+                Embora neste projeto usemos RPC manual, o MultiplayerSynchronizer está preparado para uso futuro.
+            </div>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">3</span> Cena Game.tscn (Jogo Principal)</h3>
+
+            <p><strong>Estrutura da cena:</strong></p>
+            <pre><code>Game (Node2D)
+├── GameManager (Node)
+│   ├── Players (Node2D) - Container para jogadores
+│   ├── SpawnPoints (Node2D)
+│   │   ├── SpawnPoint1 (Marker2D)
+│   │   ├── SpawnPoint2 (Marker2D)
+│   │   ├── SpawnPoint3 (Marker2D)
+│   │   └── SpawnPoint4 (Marker2D)
+│   └── MultiplayerSpawner
+├── Level (Node2D)
+│   └── Platforms (Node2D)
+│       ├── Ground (StaticBody2D) - Chão do jogo
+│       └── Platform1 (StaticBody2D) - Plataforma adicional
+└── Camera2D - Câmera do jogo</code></pre>
+
+            <p><strong>Como criar no Godot:</strong></p>
+            <ol>
+                <li>Crie uma nova cena (<strong>Scene → New Scene</strong>)</li>
+                <li>Adicione um nó <strong>Node2D</strong> como raiz (renomeie para <code>Game</code>)</li>
+                <li>Adicione um <strong>Node</strong> como filho (renomeie para <code>GameManager</code>)</li>
+                <li>Adicione o script <code>scripts/GameManager.gd</code> ao GameManager</li>
+                <li>No GameManager, adicione um <strong>Node2D</strong> (renomeie para <code>Players</code>)</li>
+                <li>Adicione outro <strong>Node2D</strong> (renomeie para <code>SpawnPoints</code>)</li>
+                <li>Dentro de SpawnPoints, adicione vários <strong>Marker2D</strong> (SpawnPoint1, SpawnPoint2, etc.)</li>
+                <li>Posicione os Marker2D onde os jogadores devem aparecer</li>
+                <li>Adicione um <strong>MultiplayerSpawner</strong> ao GameManager</li>
+                <li>No MultiplayerSpawner, configure:
+                    <ul>
+                        <li><strong>Spawn Path:</strong> ../Players</li>
+                        <li><strong>Spawnable Scenes:</strong> Adicione Player.tscn</li>
+                    </ul>
+                </li>
+                <li>No Inspector do GameManager, configure:
+                    <ul>
+                        <li><strong>Player Scene:</strong> Carregue Player.tscn</li>
+                    </ul>
+                </li>
+                <li>Adicione um <strong>Node2D</strong> chamado <code>Level</code> na raiz</li>
+                <li>Dentro de Level, adicione <strong>StaticBody2D</strong> para o chão e plataformas</li>
+                <li>Adicione <strong>Sprite2D</strong> e <strong>CollisionShape2D</strong> a cada plataforma</li>
+                <li>Adicione um <strong>Camera2D</strong> na raiz e adicione o script <code>scripts/CameraController.gd</code></li>
+                <li>Salve como <code>scenes/Game.tscn</code></li>
+            </ol>
+
+            <div class="info">
+                <strong>💡 Sobre Spawn Points:</strong><br>
+                Os Marker2D definem onde os jogadores aparecem no jogo. É importante ter vários spawn points
+                para evitar que todos os jogadores apareçam no mesmo lugar.
+            </div>
+        </div>
+
+        <h2 id="scripts">5. 💻 Explicação dos Scripts</h2>
+
+        <div class="step">
+            <h3><span class="step-number">1</span> NetworkManager.gd - Gerenciador de Rede</h3>
+
+            <p><strong>Função:</strong> Gerencia todas as conexões multiplayer do jogo. Este é um singleton (AutoLoad) que fica
+            disponível em todas as cenas.</p>
+
+            <h4>📡 Sinais (Signals):</h4>
+            <ul>
+                <li><code>player_connected(peer_id)</code> - Emitido quando um jogador se conecta</li>
+                <li><code>player_disconnected(peer_id)</code> - Emitido quando um jogador desconecta</li>
+                <li><code>connection_failed()</code> - Emitido quando falha ao conectar</li>
+                <li><code>connection_succeeded()</code> - Emitido quando conecta com sucesso</li>
+            </ul>
+
+            <h4>🔑 Constantes:</h4>
+            <ul>
+                <li><code>PORT = 7000</code> - Porta padrão do servidor</li>
+                <li><code>MAX_PLAYERS = 8</code> - Máximo de jogadores simultâneos</li>
+            </ul>
+
+            <h4>🔧 Funções Principais:</h4>
+
+            <p><strong>host_game(port)</strong> - Cria um servidor:</p>
+            <pre><code>func host_game(port: int = PORT):
+    var peer = ENetMultiplayerPeer.new()
+    var error = peer.create_server(port, MAX_PLAYERS)
+    if error != OK:
+        return false
+    multiplayer.multiplayer_peer = peer
+    _add_player(1)  # Host sempre tem ID 1
+    return true</code></pre>
+
+            <p><strong>join_game(ip, port)</strong> - Conecta a um servidor:</p>
+            <pre><code>func join_game(ip: String, port: int = PORT):
+    var peer = ENetMultiplayerPeer.new()
+    var error = peer.create_client(ip, port)
+    if error != OK:
+        return false
+    multiplayer.multiplayer_peer = peer
+    return true</code></pre>
+
+            <div class="info">
+                <strong>💡 Como funciona:</strong><br>
+                - <strong>ENetMultiplayerPeer:</strong> É o protocolo de rede usado (UDP confiável)<br>
+                - <strong>multiplayer.multiplayer_peer:</strong> Define a conexão ativa<br>
+                - <strong>Peer ID 1:</strong> Sempre é o servidor/host<br>
+                - <strong>Peer IDs 2+:</strong> São os clientes conectados
+            </div>
+
+            <h4>🎯 Callbacks Automáticos:</h4>
+            <p>O Godot chama automaticamente estas funções quando eventos de rede ocorrem:</p>
+            <ul>
+                <li><code>_on_player_connected(peer_id)</code> - Quando alguém conecta</li>
+                <li><code>_on_player_disconnected(peer_id)</code> - Quando alguém desconecta</li>
+                <li><code>_on_connection_failed()</code> - Quando falha ao conectar</li>
+                <li><code>_on_connection_succeeded()</code> - Quando conecta com sucesso</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">2</span> GameManager.gd - Gerenciador do Jogo</h3>
+
+            <p><strong>Função:</strong> Controla o estado do jogo, spawna jogadores e gerencia sincronização.</p>
+
+            <h4>📡 Sinais:</h4>
+            <ul>
+                <li><code>game_started()</code> - Emitido quando o jogo inicia</li>
+                <li><code>game_ended()</code> - Emitido quando o jogo termina</li>
+            </ul>
+
+            <h4>🔧 Variáveis Exportadas:</h4>
+            <ul>
+                <li><code>@export var player_scene: PackedScene</code> - Cena do jogador (configurada no editor)</li>
+            </ul>
+
+            <h4>🎮 Funções Principais:</h4>
+
+            <p><strong>start_game()</strong> - Inicia o jogo (apenas servidor pode chamar):</p>
+            <pre><code>func start_game():
+    if not multiplayer.is_server():
+        return  # Apenas servidor inicia
+    
+    game_started_flag = true
+    _spawn_all_players()  # Spawna todos os jogadores
+    _notify_game_started.rpc()  # Notifica clientes</code></pre>
+
+            <p><strong>_create_player_manually(peer_id, local_control)</strong> - Cria um jogador:</p>
+            <pre><code>func _create_player_manually(peer_id: int, local_control: bool):
+    var player_instance = player_scene.instantiate()
+    player_instance.setup_for_network(peer_id, local_control)
+    player_instance.position = _get_spawn_position()
+    player_instance.name = "Player_" + str(peer_id)
+    players_container.add_child(player_instance)
+    
+    # Notifica clientes sobre novo jogador
+    _notify_player_spawned.rpc(peer_id, player_instance.position)</code></pre>
+
+            <h4>📡 RPCs (Remote Procedure Calls):</h4>
+            <p>RPCs permitem que o servidor chame funções nos clientes e vice-versa:</p>
+
+            <ul>
+                <li><code>@rpc("authority", "call_local", "reliable")</code> - RPC do servidor, confiável</li>
+                <li><code>_notify_player_spawned(peer_id, position)</code> - Notifica clientes sobre novo jogador</li>
+                <li><code>_notify_player_removed(peer_id)</code> - Notifica clientes sobre jogador removido</li>
+            </ul>
+
+            <div class="warning">
+                <strong>⚠️ Importante sobre RPC:</strong><br>
+                - <strong>"authority"</strong>: Apenas o servidor pode chamar<br>
+                - <strong>"call_local"</strong>: Executa localmente também<br>
+                - <strong>"reliable"</strong>: Garante entrega (mais lento)<br>
+                - <strong>"unreliable"</strong>: Não garante entrega (mais rápido, bom para posições)
+            </div>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">3</span> Player.gd - Script do Jogador</h3>
+
+            <p><strong>Função:</strong> Controla movimento, física e sincronização de cada jogador.</p>
+
+            <h4>🎮 Variáveis Exportadas:</h4>
+            <ul>
+                <li><code>@export var speed = 300.0</code> - Velocidade horizontal</li>
+                <li><code>@export var jump_velocity = -400.0</code> - Força do pulo</li>
+                <li><code>@export var player_color = Color.BLUE</code> - Cor do jogador</li>
+            </ul>
+
+            <h4>🔑 Variáveis Importantes:</h4>
+            <ul>
+                <li><code>var player_id: int</code> - ID único do jogador</li>
+                <li><code>var is_local_player = false</code> - Se é controlado localmente</li>
+            </ul>
+
+            <h4>⚙️ Função setup_for_network():</h4>
+            <p>Esta função é chamada quando o jogador é criado, configurando a autoridade:</p>
+            <pre><code>func setup_for_network(id: int, local_control: bool):
+    player_id = id
+    is_local_player = local_control
+    set_multiplayer_authority(id)  # Define quem controla este jogador
+    
+    # Verifica se é realmente o jogador local
+    if multiplayer and multiplayer.has_multiplayer_peer():
+        is_local_player = (id == multiplayer.get_unique_id())</code></pre>
+
+            <div class="info">
+                <strong>💡 Autoridade (Authority):</strong><br>
+                Cada jogador tem autoridade sobre seu próprio personagem. Isso significa que apenas o cliente
+                com o mesmo ID pode modificar esse jogador. Outros clientes apenas recebem atualizações de posição.
+            </div>
+
+            <h4>🏃 Função _physics_process():</h4>
+            <p>Processa física e movimento (chamada 60 vezes por segundo):</p>
+            <pre><code>func _physics_process(delta):
+    # Apenas o jogador local processa input
+    if not is_local_player:
+        return
+    
+    # Processa movimento
+    _handle_movement(delta)
+    
+    # Sincroniza posição se mudou
+    if global_position.distance_to(old_position) > 1.0:
+        _sync_position.rpc(global_position, velocity)</code></pre>
+
+            <h4>🎮 Função _handle_movement():</h4>
+            <pre><code>func _handle_movement(delta):
+    # Gravidade
+    if not is_on_floor():
+        velocity.y += gravity * delta
+    
+    # Pulo
+    if Input.is_action_just_pressed("jump") and is_on_floor():
+        velocity.y = jump_velocity
+    
+    # Movimento horizontal
+    var direction = Input.get_axis("ui_left", "ui_right")
+    if direction != 0:
+        velocity.x = direction * speed
+    else:
+        velocity.x = move_toward(velocity.x, 0, speed)
+    
+    # Aplica movimento
+    move_and_slide()</code></pre>
+
+            <h4>📡 RPC de Sincronização:</h4>
+            <pre><code>@rpc("any_peer", "unreliable")
+func _sync_position(pos: Vector2, vel: Vector2):
+    # Apenas atualiza se NÃO for o jogador local
+    if not is_local_player:
+        global_position = pos
+        velocity = vel</code></pre>
+
+            <div class="warning">
+                <strong>⚠️ Por que "unreliable"?</strong><br>
+                Para sincronização de posição, usamos "unreliable" porque:
+                - É mais rápido (menos overhead)
+                - Se um pacote for perdido, o próximo já terá a posição atualizada
+                - Para posições, não é crítico perder um frame
+            </div>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">4</span> MainMenu.gd - Menu Principal</h3>
+
+            <p><strong>Função:</strong> Controla a interface do menu e gerencia conexões.</p>
+
+            <h4>🔗 Conexão de Sinais:</h4>
+            <p>No <code>_ready()</code>, conecta sinais dos botões e do NetworkManager:</p>
+            <pre><code>func _ready():
+    # Conecta botões
+    host_button.pressed.connect(_on_host_button_pressed)
+    join_button.pressed.connect(_on_join_button_pressed)
+    
+    # Conecta NetworkManager
+    NetworkManager.connection_succeeded.connect(_on_connection_succeeded)
+    NetworkManager.connection_failed.connect(_on_connection_failed)</code></pre>
+
+            <h4>🏠 Função _on_host_button_pressed():</h4>
+            <pre><code>func _on_host_button_pressed():
+    var success = NetworkManager.host_game()
+    if success:
+        # Aguarda e inicia o jogo
+        await get_tree().create_timer(2.0).timeout
+        _start_game()</code></pre>
+
+            <h4>🔗 Função _on_connect_button_pressed():</h4>
+            <pre><code>func _on_connect_button_pressed():
+    var ip = ip_input.text.strip_edges()
+    var port = int(port_input.text)
+    var success = NetworkManager.join_game(ip, port)</code></pre>
+
+            <h4>🚀 Função _start_game():</h4>
+            <pre><code>func _start_game():
+    get_tree().change_scene_to_file("res://scenes/Game.tscn")</code></pre>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">5</span> CameraController.gd - Controle da Câmera</h3>
+
+            <p><strong>Função:</strong> Faz a câmera seguir suavemente o jogador local.</p>
+
+            <h4>⚙️ Variáveis:</h4>
+            <ul>
+                <li><code>@export var follow_speed = 5.0</code> - Velocidade de seguimento</li>
+                <li><code>@export var camera_offset = Vector2(0, -50)</code> - Offset da câmera</li>
+                <li><code>var target_player: Player</code> - Jogador a ser seguido</li>
+            </ul>
+
+            <h4>🔍 Função _find_local_player_with_retry():</h4>
+            <p>Tenta encontrar o jogador local várias vezes (porque pode levar tempo para spawnar):</p>
+            <pre><code>func _find_local_player_with_retry():
+    var max_attempts = 10
+    var attempt = 0
+    
+    while attempt < max_attempts:
+        target_player = game_manager.get_local_player()
+        if target_player:
+            global_position = target_player.global_position + camera_offset
+            return
+        await get_tree().create_timer(0.5).timeout
+        attempt += 1</code></pre>
+
+            <h4>📹 Função _follow_player():</h4>
+            <p>Faz a câmera seguir suavemente usando interpolação linear (lerp):</p>
+            <pre><code>func _follow_player(delta):
+    var target_position = target_player.global_position + camera_offset
+    global_position = global_position.lerp(target_position, follow_speed * delta)</code></pre>
+
+            <div class="info">
+                <strong>💡 Lerp (Interpolação Linear):</strong><br>
+                O lerp suaviza o movimento da câmera, criando um efeito de "seguir suavemente"
+                em vez de "grudar" no jogador. Isso evita que a câmera trema.
+            </div>
+        </div>
+
+        <h2 id="multiplayer">6. 🌐 Como Funciona o Multiplayer</h2>
+
+        <h3>📊 Arquitetura Cliente-Servidor</h3>
+
+        <div class="info">
+            <strong>🏠 Servidor (Host):</strong><br>
+            - ID sempre é 1<br>
+            - Gerencia o estado do jogo<br>
+            - Spawna jogadores<br>
+            - Envia atualizações para clientes<br>
+            - Tem autoridade sobre decisões importantes
+        </div>
+
+        <div class="info">
+            <strong>👥 Clientes:</strong><br>
+            - IDs 2, 3, 4, etc.<br>
+            - Enviam inputs do jogador<br>
+            - Recebem atualizações do servidor<br>
+            - Têm autoridade apenas sobre seu próprio jogador<br>
+            - Recebem cópias dos outros jogadores
+        </div>
+
+        <h3>🔄 Fluxo de Conexão</h3>
+
+        <ol>
+            <li><strong>Host cria servidor:</strong> NetworkManager.host_game() cria um servidor ENet</li>
+            <li><strong>Cliente conecta:</strong> NetworkManager.join_game(ip, port) tenta conectar</li>
+            <li><strong>Handshake:</strong> ENet negocia a conexão</li>
+            <li><strong>Servidor adiciona jogador:</strong> _on_player_connected() é chamado</li>
+            <li><strong>Jogo inicia:</strong> GameManager spawna todos os jogadores</li>
+            <li><strong>Sincronização:</strong> Posições são sincronizadas via RPC</li>
+        </ol>
+
+        <h3>🎯 Sistema de Autoridade</h3>
+
+        <p>Cada jogador tem autoridade sobre seu próprio personagem:</p>
+        <ul>
+            <li><strong>Jogador Local:</strong> Processa input, aplica física, envia posição via RPC</li>
+            <li><strong>Jogadores Remotos:</strong> Apenas recebem atualizações de posição, não processam input</li>
+            <li><strong>Servidor:</strong> Gerencia spawn, remoção e estado geral</li>
+        </ul>
+
+        <div class="warning">
+            <strong>⚠️ Regra de Ouro do Multiplayer:</strong><br>
+            "Cada cliente controla seu próprio jogador, mas o servidor é a fonte da verdade."
+            Isso evita problemas como trapaça (cheating) e garante sincronização.
+        </div>
+
+        <h3>📡 Tipos de RPC</h3>
+
+        <table>
+            <tr>
+                <th>Tipo</th>
+                <th>Uso</th>
+                <th>Exemplo</th>
+            </tr>
+            <tr>
+                <td><code>@rpc("authority", "call_local", "reliable")</code></td>
+                <td>Servidor → Todos (confiável)</td>
+                <td>Notificar spawn de jogador</td>
+            </tr>
+            <tr>
+                <td><code>@rpc("any_peer", "unreliable")</code></td>
+                <td>Qualquer → Todos (rápido)</td>
+                <td>Sincronizar posição</td>
+            </tr>
+            <tr>
+                <td><code>@rpc("any_peer", "call_local", "reliable")</code></td>
+                <td>Qualquer → Todos (confiável)</td>
+                <td>Solicitar sincronização</td>
+            </tr>
+        </table>
+
+        <h3>🔄 Sincronização de Posição</h3>
+
+        <p>O sistema de sincronização funciona assim:</p>
+        <ol>
+            <li>Jogador local processa input e move</li>
+            <li>Se a posição mudou significativamente (>1 pixel), envia RPC</li>
+            <li>Outros clientes recebem o RPC e atualizam a posição do jogador remoto</li>
+            <li>O jogador local NÃO atualiza sua própria posição via RPC (evita conflito)</li>
+        </ol>
+
+        <h2 id="testar">7. 🧪 Como Testar o Jogo</h2>
+
+        <div class="step">
+            <h3><span class="step-number">1</span> Teste Local (Mesma Máquina)</h3>
+
+            <p><strong>Método 1: Múltiplas Instâncias do Editor</strong></p>
+            <ol>
+                <li>Abra o projeto no Godot</li>
+                <li>Execute o jogo normalmente (F5 ou Play)</li>
+                <li>Clique em "Hospedar Jogo" na primeira instância</li>
+                <li>Abra uma segunda instância do Godot com o mesmo projeto</li>
+                <li>Execute o jogo novamente (F5)</li>
+                <li>Na segunda instância, clique em "Conectar ao Jogo"</li>
+                <li>Digite <code>127.0.0.1</code> como IP e <code>7000</code> como porta</li>
+                <li>Clique em "Conectar"</li>
+            </ol>
+
+            <p><strong>Método 2: Build Exportado</strong></p>
+            <ol>
+                <li>Exporte o jogo (Project → Export)</li>
+                <li>Execute o executável exportado duas vezes</li>
+                <li>Um joga como host, outro como cliente</li>
+            </ol>
+
+            <div class="success">
+                <strong>✅ Dica:</strong> Para testar com mais jogadores, abra mais instâncias do jogo.
+                O servidor suporta até 8 jogadores simultâneos.
+            </div>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">2</span> Teste em Rede Local (LAN)</h3>
+
+            <ol>
+                <li>Certifique-se de que ambos os computadores estão na mesma rede</li>
+                <li>No computador host, descubra o IP local (cmd → ipconfig no Windows)</li>
+                <li>Execute o jogo no host e clique em "Hospedar Jogo"</li>
+                <li>No computador cliente, execute o jogo</li>
+                <li>Clique em "Conectar ao Jogo" e digite o IP do host</li>
+                <li>Clique em "Conectar"</li>
+            </ol>
+
+            <div class="warning">
+                <strong>⚠️ Firewall:</strong><br>
+                Você pode precisar permitir o jogo no firewall do Windows para conexões de rede local funcionarem.
+            </div>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">3</span> Controles do Jogo</h3>
+
+            <table>
+                <tr>
+                    <th>Ação</th>
+                    <th>Tecla(s)</th>
+                </tr>
+                <tr>
+                    <td>Mover Esquerda</td>
+                    <td>A ou Seta Esquerda</td>
+                </tr>
+                <tr>
+                    <td>Mover Direita</td>
+                    <td>D ou Seta Direita</td>
+                </tr>
+                <tr>
+                    <td>Pular</td>
+                    <td>Espaço, W ou Seta Cima</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">4</span> Debugging e Logs</h3>
+
+            <p>O jogo gera muitos logs úteis no console. Para ver:</p>
+            <ol>
+                <li>No editor, vá em <strong>Output</strong> (aba inferior)</li>
+                <li>Execute o jogo</li>
+                <li>Observe os logs com emojis (🏠, 🔗, 👤, etc.)</li>
+            </ol>
+
+            <p><strong>Logs importantes:</strong></p>
+            <ul>
+                <li>🏠 - Operações de servidor</li>
+                <li>🔗 - Operações de conexão</li>
+                <li>👤 - Operações de jogador</li>
+                <li>📡 - Operações de rede/RPC</li>
+                <li>✅ - Sucesso</li>
+                <li>❌ - Erro</li>
+            </ul>
+        </div>
+
+        <h2>🎓 Conclusão</h2>
+
+        <p>
+            Este projeto demonstra os conceitos fundamentais de multiplayer no Godot 4.5. Com este conhecimento,
+            você pode expandir para:
+        </p>
+
+        <ul>
+            <li>Sincronização de mais propriedades (vida, inventário, etc.)</li>
+            <li>Sistema de salas/lobbies</li>
+            <li>Chat em tempo real</li>
+            <li>Jogos mais complexos (RPG, estratégia, etc.)</li>
+            <li>Servidor dedicado (separado do cliente)</li>
+        </ul>
+
+        <div class="success">
+            <strong>✅ Próximos Passos:</strong><br>
+            1. Experimente adicionar mais mecânicas ao jogador<br>
+            2. Implemente sistema de salas para escolher partidas<br>
+            3. Adicione sincronização de animações<br>
+            4. Melhore a interface do menu<br>
+            5. Adicione sistema de pontuação sincronizado
+        </div>
+
+        <div style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #667eea; text-align: center; color: #777;">
+            <p>Documentação criada para o projeto Jogo Multiplayer Godot</p>
+            <p>Versão do Godot: 4.5</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -11,8 +11,8 @@ config_version=5
 [application]
 
 config/name="game-multiplayer"
-run/main_scene="uid://dteyy8k7doqy"
-config/features=PackedStringArray("4.4", "Mobile")
+run/main_scene="uid://d01dgvj3eedhw"
+config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 
 [autoload]

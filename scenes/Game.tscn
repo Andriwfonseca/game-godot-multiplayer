@@ -33,10 +33,6 @@ position = Vector2(500, 400)
 [node name="SpawnPoint4" type="Marker2D" parent="GameManager/SpawnPoints"]
 position = Vector2(700, 400)
 
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="GameManager"]
-_spawnable_scenes = PackedStringArray("uid://cg1r6vp8shsqf")
-spawn_path = NodePath("../Players")
-
 [node name="Level" type="Node2D" parent="."]
 
 [node name="Platforms" type="Node2D" parent="Level"]

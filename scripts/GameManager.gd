@@ -13,7 +13,6 @@ signal game_ended()
 # 📍 REFERÊNCIAS DOS NÓS (conectadas automaticamente)
 @onready var players_container = $Players # Container para todos os jogadores
 @onready var spawn_points = $SpawnPoints # Pontos de spawn
-@onready var multiplayer_spawner = $MultiplayerSpawner # Sistema de spawn multiplayer
 
 # 🎯 ESTADO DO JOGO
 var game_started_flag = false
@@ -37,15 +36,6 @@ func _ready():
 		print("🔗 Conectado ao NetworkManager")
 	else:
 		print("❌ NetworkManager não encontrado!")
-
-	# ⚙️ Configura MultiplayerSpawner
-	if multiplayer_spawner:
-		multiplayer_spawner.spawn_path = NodePath("Players")
-		# Adiciona Player.tscn à lista de spawnable scenes
-		if player_scene:
-			var scene_path = player_scene.resource_path
-			print("🔍 Adicionando cena à spawnable list: ", scene_path)
-		print("⚙️ MultiplayerSpawner configurado para sincronização")
 
 	# 🚀 Inicia o jogo automaticamente após um delay
 	await get_tree().create_timer(0.5).timeout
@@ -185,24 +175,6 @@ func _spawn_all_players():
 	for peer_id in NetworkManager.players.keys():
 		if peer_id != 1: # Não spawna o host novamente
 			_create_player_manually(peer_id, false)
-
-func _setup_spawned_player(player: Node, peer_id: int, is_local: bool):
-	"""
-	Configura um jogador que foi spawnado pelo MultiplayerSpawner
-	"""
-	print("⚙️ Configurando jogador spawnado: ", peer_id)
-
-	# Configura o jogador
-	if player.has_method("setup_for_network"):
-		player.setup_for_network(peer_id, is_local)
-
-	# Define posição
-	player.position = _get_spawn_position()
-
-	# Define nome
-	player.name = "Player_" + str(peer_id)
-
-	print("✅ Jogador configurado: ", player.name)
 
 func _create_player_manually(peer_id: int, local_control: bool):
 	"""
